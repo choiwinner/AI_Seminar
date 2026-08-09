@@ -1,0 +1,2371 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transformer & KV Cache H/W Seminar</title>
+
+    <!-- Google Fonts (온라인 전용 폰트, 오프라인 시 시스템 폰트 Fallback) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&family=Noto+Sans+KR:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- MathJax (온라인 전용 CDN, 오프라인 시 예외 없이 안전 렌더링) -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #070a12;
+            --card-bg: rgba(18, 26, 43, 0.85);
+            --card-border: rgba(255, 255, 255, 0.12);
+            --card-glow: rgba(56, 189, 248, 0.15);
+            
+            /* Color-Coding System */
+            --q-color: #38bdf8;       /* Query - Cyan/Blue */
+            --k-color: #34d399;       /* Key - Emerald Green */
+            --v-color: #c084fc;       /* Value - Purple */
+            --score-color: #fbbf24;   /* Score/Attention - Amber */
+            --hw-color: #f43f5e;      /* H/W Memory - Rose */
+            
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --text-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Malgun Gothic", "맑은 고딕", sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(56, 189, 248, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(192, 132, 252, 0.08) 0%, transparent 40%);
+            color: var(--text-main);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Top Progress Bar */
+        .progress-bar-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            z-index: 100;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--q-color), var(--v-color));
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px var(--q-color);
+        }
+
+        /* Top Header Control Bar */
+        .header-bar {
+            position: fixed;
+            top: 15px;
+            width: 90vw;
+            max-width: 1240px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 90;
+        }
+
+        .brand-logo {
+            font-size: 1.1rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            background: linear-gradient(135deg, #38bdf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand-badge {
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 12px;
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--q-color);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            text-fill-color: initial;
+            -webkit-text-fill-color: initial;
+        }
+
+        .header-tools {
+            display: flex;
+            gap: 10px;
+        }
+
+        .icon-btn {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .icon-btn:hover {
+            background: rgba(51, 65, 85, 0.9);
+            border-color: var(--q-color);
+            transform: translateY(-1px);
+        }
+
+        /* Slide Main Container */
+        .slide-container {
+            width: 90vw;
+            max-width: 1240px;
+            height: 82vh;
+            margin-top: 30px;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border-radius: 24px;
+            padding: 36px 44px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            border: 1px solid var(--card-border);
+            opacity: 0;
+            transform: scale(0.98);
+            transition: opacity 0.35s ease, transform 0.35s ease;
+        }
+
+        .slide.active {
+            display: flex;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Slide Header */
+        .slide-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slide-title {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .slide-title-tag {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tag-concept { background: rgba(56, 189, 248, 0.15); color: var(--q-color); border: 1px solid rgba(56, 189, 248, 0.3); }
+        .tag-math { background: rgba(52, 211, 153, 0.15); color: var(--k-color); border: 1px solid rgba(52, 211, 153, 0.3); }
+        .tag-hw { background: rgba(244, 63, 94, 0.15); color: var(--hw-color); border: 1px solid rgba(244, 63, 94, 0.3); }
+
+        .slide-number {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-sub);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Slide Body Layouts */
+        .slide-body {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            gap: 16px;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+
+        .slide-body::-webkit-scrollbar {
+            width: 6px;
+        }
+        .slide-body::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 3px;
+        }
+
+        /* Grid Layout helpers */
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .grid-3col {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+        }
+
+        /* Card Components */
+        .info-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 18px 22px;
+            transition: all 0.2s ease;
+        }
+
+        .info-card:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-q { border-left: 4px solid var(--q-color); background: rgba(56, 189, 248, 0.06); }
+        .card-k { border-left: 4px solid var(--k-color); background: rgba(52, 211, 153, 0.06); }
+        .card-v { border-left: 4px solid var(--v-color); background: rgba(192, 132, 252, 0.06); }
+        .card-score { border-left: 4px solid var(--score-color); background: rgba(251, 191, 36, 0.06); }
+        .card-hw { border-left: 4px solid var(--hw-color); background: rgba(244, 63, 94, 0.06); }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Math & Formulas */
+        .math-box {
+            font-family: 'JetBrains Mono', 'Consolas', 'Courier New', monospace;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+            font-size: 1.1rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+            overflow-x: auto;
+        }
+
+        .code-inline {
+            font-family: 'JetBrains Mono', 'Consolas', 'Courier New', monospace;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: var(--q-color);
+        }
+
+        /* Highlight Text Colors */
+        .hl-q { color: var(--q-color); font-weight: 700; }
+        .hl-k { color: var(--k-color); font-weight: 700; }
+        .hl-v { color: var(--v-color); font-weight: 700; }
+        .hl-score { color: var(--score-color); font-weight: 700; }
+        .hl-hw { color: var(--hw-color); font-weight: 700; }
+
+        /* Diagrams & Flows */
+        .pipeline-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .pipeline-step {
+            flex: 1;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 12px 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            position: relative;
+        }
+
+        .pipeline-step.active-step {
+            border-color: var(--q-color);
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+            background: rgba(56, 189, 248, 0.1);
+        }
+
+        .pipeline-arrow {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            font-weight: bold;
+        }
+
+        /* Big Equation Formula Card */
+        .formula-card {
+            background: rgba(56, 189, 248, 0.08);
+            border: 2px solid rgba(56, 189, 248, 0.3);
+            border-radius: 16px;
+            padding: 18px;
+            text-align: center;
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--q-color);
+            margin: 10px 0;
+        }
+
+        /* SVG Graph Container Box */
+        .svg-graph-box {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Tables */
+        table.custom-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 10px 0;
+        }
+
+        table.custom-table th, table.custom-table td {
+            padding: 10px 14px;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        table.custom-table th {
+            background: rgba(30, 41, 59, 0.9);
+            color: var(--q-color);
+            font-weight: 700;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        table.custom-table td {
+            background: rgba(15, 23, 42, 0.5);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        table.custom-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Speaker Note Footer */
+        .speaker-note {
+            font-size: 0.9rem;
+            color: var(--score-color);
+            background: rgba(251, 191, 36, 0.08);
+            border: 1px dashed rgba(251, 191, 36, 0.4);
+            padding: 10px 16px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        /* Navigation Controls Bottom Bar */
+        .nav-controls {
+            position: absolute;
+            bottom: -55px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-nav {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            color: var(--text-main);
+            border: 1px solid var(--card-border);
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-nav:hover:not(:disabled) {
+            background: linear-gradient(135deg, #38bdf8, #0284c7);
+            color: #0f172a;
+            border-color: #38bdf8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(56, 189, 248, 0.4);
+        }
+
+        .btn-nav:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .page-indicator-btn {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--card-border);
+            color: var(--text-sub);
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s ease;
+        }
+
+        .page-indicator-btn:hover {
+            color: var(--text-main);
+            border-color: var(--q-color);
+        }
+
+        /* Modal for Quick Jump */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+        }
+
+        .modal-content {
+            background: var(--bg-color);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 650px;
+            max-height: 80vh;
+            padding: 24px;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 12px;
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--q-color);
+        }
+
+        .slide-jump-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .jump-item {
+            padding: 12px 16px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .jump-item:hover {
+            background: rgba(56, 189, 248, 0.15);
+            border-color: var(--q-color);
+            transform: translateX(4px);
+        }
+
+        .jump-item.active {
+            border-color: var(--q-color);
+            background: rgba(56, 189, 248, 0.2);
+            font-weight: bold;
+        }
+
+        .key-badge {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 4px;
+            padding: 1px 5px;
+            font-size: 0.75rem;
+            font-family: monospace;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Top Progress Bar -->
+    <div class="progress-bar-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- Header Navigation & Utilities -->
+    <div class="header-bar">
+        <div class="brand-logo">
+            <span>TRANSFORMER & KV CACHE</span>
+            <span class="brand-badge">H/W SEMINAR</span>
+        </div>
+        <div class="header-tools">
+            <button class="icon-btn" onclick="toggleModal()">
+                <span>📋</span> 목차 (Index)
+            </button>
+            <button class="icon-btn" onclick="toggleNotes()">
+                <span>💡</span> 노티 (Notes)
+            </button>
+            <button class="icon-btn" onclick="toggleFullScreen()">
+                <span>🖥️</span> 전체화면
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Slides Container -->
+    <div class="slide-container">
+
+        <!-- Slide 1: Overview & Transformer Architecture -->
+        <div class="slide active">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>1. 트랜스포머 & KV Cache H/W 개요</span>
+                    <span class="slide-title-tag tag-concept">Overview</span>
+                </div>
+                <div class="slide-number">Slide 1 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>현대 대형 언어 모델(LLM)의 핵심 아키텍처인 <b>Transformer</b>의 본질은 모든 단어가 서로를 참조하여 맥락을 파악하는 <b>Self-Attention 메커니즘</b>에 있습니다.</p>
+                
+                <div class="info-card card-q">
+                    <div class="card-title">🌐 Transformer 핵심 파이프라인 (Data Flow)</div>
+                    <div class="pipeline-flow">
+                        <div class="pipeline-step active-step">입력 텍스트</div>
+                        <div class="pipeline-arrow">→</div>
+                        <div class="pipeline-step active-step">임베딩 (Embedding)</div>
+                        <div class="pipeline-arrow">→</div>
+                        <div class="pipeline-step active-step">유사도 측정 (Dot Product)</div>
+                        <div class="pipeline-arrow">→</div>
+                        <div class="pipeline-step active-step">QKV & Attention</div>
+                        <div class="pipeline-arrow">→</div>
+                        <div class="pipeline-step active-step">KV Cache H/W</div>
+                    </div>
+                </div>
+
+                <div class="grid-2col">
+                    <div class="info-card card-score">
+                        <div class="card-title">🎯 핵심 세미나 질문</div>
+                        <p style="font-size: 0.95rem;">
+                            1. 왜 학습이 끝나도 사용자 수에 따라 HBM 메모리가 폭발할까요? ➔ <b>KV Cache & HBM 대역폭</b><br>
+                            2. MHA와 Positional Encoding은 어떤 한계를 극복하는가? ➔ <b>후반부 독립 소개</b>
+                        </p>
+                    </div>
+                    <div class="info-card card-hw">
+                        <div class="card-title">⚡ 학습 로드맵</div>
+                        <p style="font-size: 0.95rem;">단어 벡터화 → 3대 거리/유사도 지표 → I, LOVE, YOU 수치 연산 → Prefill/Decoding & KV Cache → HBM 메모리 경제학</p>
+                    </div>
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>Presenter Note:</b> 본 세미나에서는 "I LOVE YOU" 수치 연산과 LLM 추론에서의 KV Cache 도입 이유, 그리고 사용자 폭증 시 HBM 메모리 요구량의 폭발 원리를 다룹니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Embedding Concept (King - Man + Woman = Queen) -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>2. 임베딩 (Embedding) - 단어를 의미 공간의 좌표로</span>
+                    <span class="slide-title-tag tag-concept">Core Concept</span>
+                </div>
+                <div class="slide-number">Slide 2 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>컴퓨터는 'King', 'Queen', 'Man', 'Woman'이라는 글자 자체를 이해할 수 없으므로 다차원 공간상의 <b>수치 벡터(Vector)</b>로 변환합니다.</p>
+                
+                <div class="formula-card">
+                    👑 Vector("King") − 👨 Vector("Man") + 👩 Vector("Woman") ≈ 👸 Vector("Queen")
+                </div>
+
+                <div class="grid-2col">
+                    <div class="info-card card-q">
+                        <div class="card-title">💡 이 연산이 의미하는 바는 무엇일까요?</div>
+                        <p style="font-size: 0.92rem;">
+                            - <b>"King"</b>이란 단어의 의미 벡터에서 <b>"Man(남성성)"</b> 개념을 뺀 뒤(-), <b>"Woman(여성성)"</b> 개념을 더하면(+)...<br>
+                            - 놀랍게도 공간상에서 <b>"Queen"</b> 단어가 위치한 벡터 좌표와 거의 완벽히 일치하게 됩니다!
+                        </p>
+                    </div>
+                    <div class="info-card card-k">
+                        <div class="card-title">📐 의미 공간 (Semantic Space)의 원리</div>
+                        <p style="font-size: 0.92rem;">
+                            임베딩(Embedding)이란 단어가 가진 고유한 **의미(Meaning)**를 다차원 공간상의 <b>방향과 거리를 갖는 벡터</b>로 매핑하는 기술입니다.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>핵심 정리:</b> 임베딩 공간에서는 비슷한 의미의 단어끼리 가까이 뭉치고, 단어 간 덧셈/뺄셈을 통해 새로운 의미 조합을 계산할 수 있습니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Embedding Vector Numerical Example -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>3. 임베딩 벡터 수치 예제 (\(d=4\) 특성 축)</span>
+                    <span class="slide-title-tag tag-math">Math Example</span>
+                </div>
+                <div class="slide-number">Slide 3 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>4개의 특성(Feature) 축 <b>[남성성, 왕권, 여성성, 나이]</b>으로 각 단어를 4차원 벡터로 표현해 봅시다.</p>
+
+                <div class="grid-2col">
+                    <div class="info-card card-q">
+                        <div class="card-title">📊 4차원 단어 임베딩 벡터 정의</div>
+                        <ul style="margin-left: 15px; font-size: 0.9rem; line-height: 1.8;">
+                            <li>\(\text{King} = [\mathbf{0.9}, \, \mathbf{0.9}, \, 0.1, \, 0.7]\) (남성성 high, 왕권 high)</li>
+                            <li>\(\text{Man} = [\mathbf{0.9}, \, 0.0, \, 0.1, \, 0.6]\) (남성성 high, 왕권 zero)</li>
+                            <li>\(\text{Woman} = [0.1, \, 0.0, \, \mathbf{0.9}, \, 0.6]\) (여성성 high, 왕권 zero)</li>
+                            <li>\(\text{Queen} = [0.1, \, \mathbf{0.9}, \, \mathbf{0.9}, \, 0.7]\) (여성성 high, 왕권 high)</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card card-v">
+                        <div class="card-title">🧮 실제 벡터 덧셈/뺄셈 연산 과정</div>
+                        <div class="math-box" style="font-size: 0.85rem; text-align: left; line-height: 1.8;">
+                            &nbsp;&nbsp;\(\text{King} \quad [0.9, \, 0.9, \, 0.1, \, 0.7]\)<br>
+                            \(-\text{Man} \quad [0.9, \, 0.0, \, 0.1, \, 0.6]\)<br>
+                            \(+\text{Woman} \, [0.1, \, 0.0, \, 0.9, \, 0.6]\)<br>
+                            ------------------------------------<br>
+                            \(=\mathbf{[0.1, \, 0.9, \, 0.9, \, 0.7]} \rightarrow \text{\mathbf{Queen} 벡터와 100% 일치!}\)
+                        </div>
+                    </div>
+                </div>
+
+                <p style="font-size: 0.95rem;">이처럼 다차원 공간상에서 단어의 특성(Feature)이 수치화되어 있어, 컴퓨터는 <b>벡터 연산만으로 인간의 언어 논리와 관계를 계산</b>하게 됩니다.</p>
+
+                <div class="speaker-note">
+                    💡 <b>특성 차원(Dimension):</b> 실제 LLM(LLaMA 등)에서는 4차원이 아닌 \(d_{model} = 4096\)~\(8192\) 이상의 거대한 다차원 공간을 사용합니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Distance vs Similarity -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>4. 동일한 두 벡터로 비교하는 Distance vs Similarity</span>
+                    <span class="slide-title-tag tag-concept">Core Concept</span>
+                </div>
+                <div class="slide-number">Slide 4 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>동일한 <b>두 벡터 \(\vec{A}(1, 2)\)와 \(\vec{B}(4, 8)\)</b>를 모델링하여 3가지 지표의 극적인 차이점을 비교해 봅시다.</p>
+
+                <div class="grid-2col">
+                    <div class="info-card card-q">
+                        <div class="card-title">📝 두 문장의 의미 예시</div>
+                        <ul style="margin-left: 15px; font-size: 0.9rem;">
+                            <li><b>벡터 \(\vec{A}(1, 2)\):</b> 짧은 문장 (예: <i>"사과가 맛있다"</i>)</li>
+                            <li><b>벡터 \(\vec{B}(4, 8)\):</b> 길지만 의미가 같은 문장 (예: <i>"사과가 정말 매우 엄청나게 맛있다"</i>)</li>
+                            <li>\(\vec{B} = 4 \times \vec{A}\) (방향은 같고 크기만 4배)</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card card-score">
+                        <div class="card-title">🔍 3대 지표 미리보기 요약</div>
+                        <ul style="margin-left: 15px; font-size: 0.9rem;">
+                            <li><b>코사인 유사도:</b> <span class="hl-q">\(\cos\theta = 1.00\) (완벽 동일 의미!)</span></li>
+                            <li><b>유클리드 거리:</b> <span class="hl-hw">\(d = 6.71\) (물리적 거리가 멂)</span></li>
+                            <li><b>맨해튼 거리:</b> <span class="hl-hw">\(d = 9.00\) (물리적 거리가 매우 멂)</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>시사점:</b> 문장 길이에 의한 벡터 크기 차이로 인해 유클리드/맨해튼 거리는 멀어지지만, 코사인 유사도는 완벽히 같은 의미로 잡아냅니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Euclidean Distance (L2) -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>5. 유클리드 거리 (Euclidean Distance, \(L_2\))</span>
+                    <span class="slide-title-tag tag-math">Distance Metric</span>
+                </div>
+                <div class="slide-number">Slide 5 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>피타고라스 정리에 기초하여 두 점 \(A(1,2)\)와 \(B(4,8)\) 사이의 <b>최단 대각선 직선 거리</b>를 구합니다.</p>
+
+                <div class="grid-2col">
+                    <div class="svg-graph-box">
+                        <svg width="340" height="220" viewBox="0 0 340 220" style="background: transparent;">
+                            <line x1="30" y1="200" x2="310" y2="200" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+                            <line x1="30" y1="20" x2="30" y2="200" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+                            <line x1="90" y1="20" x2="90" y2="200" stroke="rgba(255,255,255,0.06)" stroke-dasharray="2,2"/>
+                            <line x1="270" y1="20" x2="270" y2="200" stroke="rgba(255,255,255,0.06)" stroke-dasharray="2,2"/>
+                            <line x1="30" y1="160" x2="310" y2="160" stroke="rgba(255,255,255,0.06)" stroke-dasharray="2,2"/>
+                            <line x1="30" y1="40" x2="310" y2="40" stroke="rgba(255,255,255,0.06)" stroke-dasharray="2,2"/>
+
+                            <line x1="90" y1="160" x2="270" y2="160" stroke="#64748b" stroke-width="2" stroke-dasharray="4,4"/>
+                            <text x="180" y="178" fill="#94a3b8" font-size="12" text-anchor="middle">Δx = 4 - 1 = 3</text>
+
+                            <line x1="270" y1="40" x2="270" y2="160" stroke="#64748b" stroke-width="2" stroke-dasharray="4,4"/>
+                            <text x="295" y="105" fill="#94a3b8" font-size="12" text-anchor="middle">Δy = 8 - 2 = 6</text>
+
+                            <line x1="90" y1="160" x2="270" y2="40" stroke="#34d399" stroke-width="4"/>
+                            <text x="165" y="90" fill="#34d399" font-size="14" font-weight="bold">d = √45 ≈ 6.71</text>
+
+                            <circle cx="90" cy="160" r="7" fill="#38bdf8"/>
+                            <text x="70" y="150" fill="#38bdf8" font-size="13" font-weight="bold">A (1, 2)</text>
+
+                            <circle cx="270" cy="40" r="7" fill="#c084fc"/>
+                            <text x="235" y="30" fill="#c084fc" font-size="13" font-weight="bold">B (4, 8)</text>
+                        </svg>
+                    </div>
+
+                    <div class="info-card card-k">
+                        <div class="card-title">🧮 유클리드 거리 계산 (\(A(1,2), B(4,8)\))</div>
+                        <div class="math-box" style="font-size: 0.95rem; text-align: left;">
+                            $$d(A, B) = \sqrt{(4-1)^2 + (8-2)^2}$$
+                            \(d = \sqrt{3^2 + 6^2} = \sqrt{9 + 36} = \sqrt{45} \approx \mathbf{6.71}\)
+                        </div>
+                        <p style="font-size: 0.85rem; margin-top: 8px;">
+                            ⚠️ <b>거리의 문제점:</b> 두 문장의 의미가 완벽히 같음에도 불구하고, 수치 거리가 <b>6.71</b>로 크게 계산되어 "서로 다른 문장"으로 착각하게 됩니다.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>기하학적 분석:</b> 점 A(1,2)에서 B(4,8)까지 대각선 빗변 최단 거리는 6.71로 물리적 떨어진 길이가 길게 산출됩니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Manhattan Distance (L1) -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>6. 맨해튼 거리 (Manhattan Distance, \(L_1\))</span>
+                    <span class="slide-title-tag tag-math">Distance Metric</span>
+                </div>
+                <div class="slide-number">Slide 6 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>동일한 두 점 \(A(1,2)\)와 \(B(4,8)\)에 대해 격자 도로망을 따라 **직각 이동 거리의 합**을 구합니다.</p>
+
+                <div class="grid-2col">
+                    <div class="svg-graph-box">
+                        <svg width="340" height="220" viewBox="0 0 340 220" style="background: transparent;">
+                            <line x1="30" y1="200" x2="310" y2="200" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+                            <line x1="30" y1="20" x2="30" y2="200" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+
+                            <line x1="90" y1="160" x2="270" y2="160" stroke="#f43f5e" stroke-width="4"/>
+                            <text x="180" y="180" fill="#f43f5e" font-size="12" font-weight="bold" text-anchor="middle">가로 이동 |4-1| = 3</text>
+
+                            <line x1="270" y1="160" x2="270" y2="40" stroke="#f43f5e" stroke-width="4"/>
+                            <text x="295" y="105" fill="#f43f5e" font-size="12" font-weight="bold" text-anchor="middle">세로 이동 |8-2| = 6</text>
+
+                            <circle cx="90" cy="160" r="7" fill="#38bdf8"/>
+                            <text x="65" y="150" fill="#38bdf8" font-size="13" font-weight="bold">A (1, 2)</text>
+
+                            <circle cx="270" cy="40" r="7" fill="#c084fc"/>
+                            <text x="235" y="30" fill="#c084fc" font-size="13" font-weight="bold">B (4, 8)</text>
+
+                            <rect x="80" y="90" width="140" height="30" rx="6" fill="rgba(244,63,94,0.2)" stroke="#f43f5e"/>
+                            <text x="150" y="110" fill="#f43f5e" font-size="13" font-weight="bold" text-anchor="middle">총 거리 = 3 + 6 = 9.0</text>
+                        </svg>
+                    </div>
+
+                    <div class="info-card card-hw">
+                        <div class="card-title">🧮 맨해튼 거리 계산 (\(A(1,2), B(4,8)\))</div>
+                        <div class="math-box" style="font-size: 0.95rem; text-align: left;">
+                            $$d(A, B) = |4 - 1| + |8 - 2|$$
+                            \(d = 3 + 6 = \mathbf{9.00}\)
+                        </div>
+                        <p style="font-size: 0.85rem; margin-top: 8px;">
+                            ⚠️ <b>한계점:</b> 거리 기반 지표 중에서 가장 긴 <b>9.00</b>의 물리적 거리가 산출되어, 자연어 의미 측정용으로는 부적합함을 증명합니다.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>기하학적 분석:</b> 맨해튼 거리는 가로 3 단위 + 세로 6 단위를 단순 합산하여 가장 먼 9.0의 거리를 보여줍니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Cosine Similarity -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>7. 코사인 유사도 (Cosine Similarity)</span>
+                    <span class="slide-title-tag tag-math">Similarity Metric</span>
+                </div>
+                <div class="slide-number">Slide 7 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>동일한 두 벡터 \(\vec{A}(1,2)\)와 \(\vec{B}(4,8)\)에 대해 **화살표의 사이각(\(\theta\))**만을 측정해 봅시다.</p>
+
+                <div class="grid-2col">
+                    <div class="svg-graph-box">
+                        <svg width="340" height="220" viewBox="0 0 340 220" style="background: transparent;">
+                            <line x1="30" y1="200" x2="310" y2="200" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+                            <line x1="30" y1="20" x2="30" y2="200" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+                            <text x="20" y="215" fill="#94a3b8" font-size="11">O (0,0)</text>
+
+                            <line x1="30" y1="200" x2="270" y2="40" stroke="#c084fc" stroke-width="6"/>
+                            <line x1="30" y1="200" x2="90" y2="160" stroke="#38bdf8" stroke-width="6"/>
+                            <polygon points="270,40 258,45 264,55" fill="#c084fc"/>
+
+                            <text x="100" y="175" fill="#38bdf8" font-size="12" font-weight="bold">Vector A (1, 2)</text>
+                            <text x="240" y="30" fill="#c084fc" font-size="12" font-weight="bold">Vector B (4, 8)</text>
+
+                            <rect x="80" y="70" width="180" height="35" rx="6" fill="rgba(56,189,248,0.2)" stroke="#38bdf8"/>
+                            <text x="170" y="92" fill="#38bdf8" font-size="13" font-weight="bold" text-anchor="middle">θ = 0°  ➔  cos(0°) = 1.00!</text>
+                        </svg>
+                    </div>
+
+                    <div class="info-card card-q">
+                        <div class="card-title">🧮 코사인 유사도 계산 (\(\vec{A}(1,2), \vec{B}(4,8)\))</div>
+                        <div class="math-box" style="font-size: 0.95rem; text-align: left;">
+                            $$\cos(\theta) = \frac{(1\times4) + (2\times8)}{\sqrt{1^2+2^2} \sqrt{4^2+8^2}} = \frac{4 + 16}{\sqrt{5} \sqrt{80}}$$
+                            \(\cos(\theta) = \frac{20}{\sqrt{400}} = \frac{20}{20} = \mathbf{\textcolor{#38bdf8}{1.00}} \quad (\theta = 0^\circ)\)
+                        </div>
+                        <p style="font-size: 0.85rem; margin-top: 8px;">
+                            🎉 <b>정확한 판별:</b> 유클리드/맨해튼 거리는 멀었지만, 코사인 유사도는 **1.00 (완벽히 같은 의미)**임을 완벽히 밝혀냅니다!
+                        </p>
+                    </div>
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>결론:</b> 벡터 B가 벡터 A의 정확히 4배 직선상에 존재하므로 사이각은 0도이며, 코사인값은 최대치인 1.00을 산출합니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Why Dot Product for Transformer? -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>8. 왜 트랜스포머는 Dot Product(내적)을 사용하는가?</span>
+                    <span class="slide-title-tag tag-hw">H/W & Math Logic</span>
+                </div>
+                <div class="slide-number">Slide 8 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>코사인 유사도나 유클리드 거리 대신 **Dot Product (\(A \cdot B^T = \sum A_i B_i\))**를 선택한 2가지 강력한 이유가 있습니다.</p>
+
+                <div class="grid-2col">
+                    <div class="info-card card-q">
+                        <div class="card-title">1️⃣ 수학적 이유: 방향 + 크기(Magnitude)의 유용한 결합</div>
+                        <ul style="margin-left: 15px; font-size: 0.88rem; line-height: 1.7;">
+                            <li>코사인 유사도 \(\frac{A \cdot B}{\|A\|\|B\|}\)에서 분모(길이 정규화)를 생략하면 <b>Dot Product \(A \cdot B^T\)</b>가 됩니다.</li>
+                            <li>내적은 두 단어의 **방향 일치성**뿐만 아니라, 특정 중요 단어가 갖는 **벡터의 크기(Magnitude/시그널 강도)**까지 어텐션 가중치 점수에 자연스럽게 녹여냅니다.</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card card-hw">
+                        <div class="card-title">2️⃣ H/W 연산 이유: NPU/GPU Tensor Core 100% 가속</div>
+                        <ul style="margin-left: 15px; font-size: 0.88rem; line-height: 1.7;">
+                            <li>유클리드/맨해튼/코사인의 **제곱근(\(\sqrt{x}\)), 절대값(\(|x|\)), 나눗셈(\(\div\)) 연산**은 텐서 연산 코어에서 극도로 비효율적입니다.</li>
+                            <li>반면 **Dot Product (\(QK^T\))는 순수한 행렬 곱 GEMM/MAC (Multiply-Accumulate)** 연산으로, GPU/NPU의 Tensor Core 하드웨어가 가장 압도적인 TB/s 속도로 처리할 수 있습니다.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="formula-card" style="font-size: 1.1rem; padding: 14px;">
+                    ⚡ Dot Product (\(QK^T\)) = 수학적 유용성 (방향+강도) × H/W 연산 최적화 (GEMM/MAC 100% 가속)
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>H/W 시사점:</b> 알고리즘 설계 시 성능뿐만 아니라 하드웨어 가속기(Tensor Core)가 가장 빠르게 처리할 수 있는 연산인가가 트랜스포머 성공의 열쇠였습니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: 3D to High-Dimensional Scalability -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>9. 3차원에서 수천 차원(LLM \(d=4096\))으로의 확장성</span>
+                    <span class="slide-title-tag tag-concept">Scalability</span>
+                </div>
+                <div class="slide-number">Slide 9 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>2차원에서 살펴본 내적과 코사인 유사도 개념은 <b>3차원(3D) 및 수천 차원 LLM 공간</b>으로도 완벽히 확장됩니다.</p>
+
+                <div class="grid-2col">
+                    <div class="info-card card-k">
+                        <div class="card-title">📦 3차원 공간 내적 예시 (\(\vec{A}(1,2,2)\) vs \(\vec{B}(2,4,4)\))</div>
+                        <div class="math-box" style="font-size: 0.9rem; text-align: left;">
+                            <b>Dot Product (내적):</b><br>
+                            \(A \cdot B^T = (1\times2) + (2\times4) + (2\times4) = 2 + 8 + 8 = \mathbf{18}\)<br><br>
+                            <b>코사인 유사도:</b><br>
+                            \(\cos(\theta) = \frac{18}{\sqrt{1+4+4} \sqrt{4+16+16}} = \frac{18}{3 \times 6} = \mathbf{\textcolor{#34d399}{1.00}}\)
+                        </div>
+                        <p style="font-size: 0.85rem; margin-top: 5px;">3차원에서도 두 화살표가 완벽히 포개어져 코사인 유사도 1.00 산출!</p>
+                    </div>
+
+                    <div class="info-card card-hw">
+                        <div class="card-title">🚀 수천 차원(LLM \(d_{model}=4096\)) 확장 원리</div>
+                        <ul style="margin-left: 15px; font-size: 0.88rem; line-height: 1.7;">
+                            <li>차원이 아무리 늘어나도 내적 연산은 단지 각 성분 곱의 합 <b>\(\sum_{i=1}^{4096} A_i B_i\) (MAC 연산)</b>의 단순 연장에 불과합니다.</li>
+                            <li><b>H/W 가속 혜택:</b> 무한한 차원 확장성 덕분에 GPU/NPU의 Tensor Core가 4096차원 벡터의 내적을 병렬로 <b>0.0001ms 미만</b>으로 초고속 계산(Batched GEMM)할 수 있습니다.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>확장성(Scalability):</b> 고차원에서도 복잡한 연산 없이 단순 곱셈/덧셈(MAC)으로 유사도를 산출하므로, LLM의 거대한 임베딩 차원을 효율적으로 다룰 수 있습니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Dot Product Numerical Example -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>10. 닷 연산 (Dot Product) 실전 수치 계산 예제</span>
+                    <span class="slide-title-tag tag-math">Math Example</span>
+                </div>
+                <div class="slide-number">Slide 10 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>실제 4차원 임베딩 벡터값으로 두 단어 간 **내적(Dot Product) 수치**를 직접 계산해 봅시다.</p>
+
+                <div class="math-box">
+                    $$\text{Similarity}(A, B) = A \cdot B^T = \sum_{i=1}^{d} A_i B_i$$
+                </div>
+
+                <div class="grid-2col">
+                    <div class="info-card card-score">
+                        <div class="card-title">1️⃣ \(\text{Sim}(\text{King}, \text{Queen})\) 계산</div>
+                        <div class="code-inline" style="display:block; margin:5px 0;">
+                            [0.9, 0.9, 0.1, 0.7] · [0.1, 0.9, 0.9, 0.7]^T<br>
+                            = (0.9×0.1) + (0.9×0.9) + (0.1×0.9) + (0.7×0.7)<br>
+                            = 0.09 + 0.81 + 0.09 + 0.49 = <span class="hl-score">1.48 (높은 유사도!)</span>
+                        </div>
+                        <p style="font-size: 0.85rem;">왕권과 나이 등 핵심 의미 축이 일치하여 높은 유사도 형성.</p>
+                    </div>
+
+                    <div class="info-card card-hw">
+                        <div class="card-title">2️⃣ \(\text{Sim}(\text{King}, \text{Apple})\) 계산</div>
+                        <div class="code-inline" style="display:block; margin:5px 0;">
+                            [0.9, 0.9, 0.1, 0.7] · [0.0, 0.0, 0.0, 0.1]^T (Apple)<br>
+                            = (0) + (0) + (0) + (0.07)<br>
+                            = <span class="hl-hw">0.07 (연관성 없음!)</span>
+                        </div>
+                        <p style="font-size: 0.85rem;">의미 축이 일치하지 않아 내적 값이 0에 가깝게 직교함.</p>
+                    </div>
+                </div>
+
+                <div class="info-card card-q">
+                    <div class="card-title">🎯 Self-Attention에서의 적용</div>
+                    <p style="font-size: 0.9rem;">
+                        트랜스포머는 문장 내 모든 단어 쌍에 대해 이 내적 연산을 한 번에 수행하여, **"어떤 단어가 어떤 단어에 집중(Attention)해야 하는가?"**를 행렬 곱으로 즉시 찾아냅니다.
+                    </p>
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>단순성:</b> 곱하고 더하는 덧셈/곱셈(MAC)만으로 단어 간 복잡한 문맥 관계를 완벽하게 수치화할 수 있습니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Setup for "I LOVE YOU" & Matrix Dimension Reason -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>11. 전체 문장 "I LOVE YOU" & 가중치 행렬(\(4\times2\)) 원리</span>
+                    <span class="slide-title-tag tag-concept">Setup & Projection</span>
+                </div>
+                <div class="slide-number">Slide 11 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>문장 <b>"I LOVE YOU"</b>의 3개 단어는 **단 하나의 동일한 가중치 행렬(\(W^Q, W^K, W^V\))**을 통과합니다.</p>
+
+                <div class="grid-2col">
+                    <div class="info-card card-q">
+                        <div class="card-title">📝 3개 단어 입력 벡터 ($d_{model}=4$)</div>
+                        <ul style="margin-left: 15px; font-size: 0.88rem; line-height: 1.7;">
+                            <li>\(\text{I} = [1, \, 0, \, 1, \, 0]\)</li>
+                            <li>\(\text{LOVE} = [0, \, 1, \, 0, \, 1]\)</li>
+                            <li>\(\text{YOU} = [1, \, 1, \, 0, \, 0]\)</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card card-hw">
+                        <div class="card-title">💡 왜 가중치 행렬은 \(4 \times 2\) 인가?</div>
+                        <p style="font-size: 0.85rem; line-height: 1.6;">
+                            입력 4차원(\(d_{model}=4\)) 데이터를 계산 효율성이 높은 **2차원(\(d_k=2\)) 어텐션 공간으로 축소/투영(Projection)**하기 위함입니다.<br>
+                            \((1 \times 4) \times (4 \times 2) = (1 \times 2)\)로 차원이 줄어들어 H/W 가속에 매우 유리합니다.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="info-card card-k">
+                    <div class="card-title">⚙️ 세 단어 공통 적용 가중치 행렬 (Shared Weight)</div>
+                    <div class="math-box" style="font-size: 0.85rem; margin: 4px 0;">
+                        $$W^Q = \begin{bmatrix} 1 & 0 \\ 0 & 1 \\ 0 & 0 \\ 0 & 0 \end{bmatrix}, \quad W^K = \begin{bmatrix} 1 & 0 \\ 0 & 1 \\ 0 & 0 \\ 0 & 0 \end{bmatrix}, \quad W^V = \begin{bmatrix} 0 & 0 \\ 0 & 0 \\ 1 & 0 \\ 0 & 1 \end{bmatrix}$$
+                    </div>
+                    <p style="font-size: 0.85rem;">'I', 'LOVE', 'YOU' 세 단어 모두 <b>동일한 가중치 파라미터</b>를 통과하여 통일된 규칙으로 분신을 형성합니다.</p>
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>핵심:</b> 가중치 행렬이 4x2인 이유는 차원 축소(Projection) 목적이며, 모든 단어가 동일한 WQ, WK, WV를 공유한다는 점이 모델 학습의 일관성을 만듭니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Word 'I' - Q, K, V Projection Full Math -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>12. 단어 'I'의 \(Q_I, K_I, V_I\) 투영 수치 계산</span>
+                    <span class="slide-title-tag tag-math">Math Step</span>
+                </div>
+                <div class="slide-number">Slide 12 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>단어 <b>'I' (\([1, 0, 1, 0]\))</b>의 \(Q_I, K_I, V_I\) 변환 행렬 곱 풀이 과정입니다.</p>
+
+                <div class="math-box" style="font-size: 0.88rem; text-align: left; line-height: 1.8;">
+                    <b>① Query (\(Q_I\)):</b><br>
+                    \(Q_I = [1,0,1,0] \begin{bmatrix} 1&0 \\ 0&1 \\ 0&0 \\ 0&0 \end{bmatrix} = [1\times1+0\times0+1\times0+0\times0, \; 1\times0+0\times1+1\times0+0\times0] = \mathbf{\textcolor{#38bdf8}{[1, 0]}}\)<br><br>
+                    
+                    <b>② Key (\(K_I\)):</b><br>
+                    \(K_I = [1,0,1,0] \begin{bmatrix} 1&0 \\ 0&1 \\ 0&0 \\ 0&0 \end{bmatrix} = [1\times1+0\times0+1\times0+0\times0, \; 1\times0+0\times1+1\times0+0\times0] = \mathbf{\textcolor{#34d399}{[1, 0]}}\)<br><br>
+                    
+                    <b>③ Value (\(V_I\)):</b><br>
+                    \(V_I = [1,0,1,0] \begin{bmatrix} 0&0 \\ 0&0 \\ 1&0 \\ 0&1 \end{bmatrix} = [1\times0+0\times0+1\times1+0\times0, \; 1\times0+0\times0+1\times0+0\times1] = \mathbf{\textcolor{#c084fc}{[0, 1]}}\)
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>결과:</b> 단어 'I'는 질문 $Q_I=[1,0]$, 키 $K_I=[1,0]$, 내용 데이터 $V_I=[0,1]$로 분신 변환되었습니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Word 'I' - Self Attention Step -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>13. 단어 'I' 자기 자신과의 Self-Attention 연산</span>
+                    <span class="slide-title-tag tag-concept">Self-Attention</span>
+                </div>
+                <div class="slide-number">Slide 13 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>단어 'I'의 질문(\(Q_I\))과 자신의 키(\(K_I\))를 곱해 자기 자신과의 관심도 점수를 구합니다.</p>
+
+                <div class="grid-2col">
+                    <div class="info-card card-score">
+                        <div class="card-title">🎯 1. 관심도 내적 점수 (Score)</div>
+                        <div class="math-box" style="font-size: 0.9rem;">
+                            $$\text{Score} = Q_I \cdot K_I^T = [1, 0] \cdot [1, 0]^T$$
+                            $$= (1 \times 1) + (0 \times 0) = \mathbf{1.0}$$
+                        </div>
+                        <p style="font-size: 0.85rem; margin-top: 5px;">"자신의 질문과 열쇠가 100% 일치하여 점수 1.0 형성!"</p>
+                    </div>
+
+                    <div class="info-card card-v">
+                        <div class="card-title">📦 2. Value 곱산 Output</div>
+                        <div class="math-box" style="font-size: 0.9rem;">
+                            $$\text{Output}_I = \text{Score} \times V_I = 1.0 \times [0, 1]$$
+                            $$= \mathbf{\textcolor{#c084fc}{[0, 1]}}$$
+                        </div>
+                        <p style="font-size: 0.85rem; margin-top: 5px;">단어 'I'의 어텐션 결과 자기 자신의 원래 내용 데이터가 유지됩니다.</p>
+                    </div>
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>최소 단위 원리:</b> 다른 단어와 연산하기 전 자기 자신과의 연결 점수가 1.0임을 직관적으로 확인했습니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: Why Multiply Value (V) after Score & V Matrix Size -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>14. 왜 어텐션 점수(Score) 뒤에 Value(V)를 또 곱하는가?</span>
+                    <span class="slide-title-tag tag-concept">Core Concept</span>
+                </div>
+                <div class="slide-number">Slide 14 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>\(QK^T\)로 관심도 점수(Score)를 구했음에도 <b>Value(\(V\))를 곱해야 하는 결정적 이유</b>와 <b>크기의 비밀</b>입니다.</p>
+
+                <div class="grid-2col">
+                    <div class="info-card card-score">
+                        <div class="card-title">📊 1. Score vs Value의 비유적 차이</div>
+                        <ul style="margin-left: 15px; font-size: 0.88rem; line-height: 1.7;">
+                            <li><b>어텐션 점수 (Score):</b> **"레시피 비율 지시서"**<br>➔ *"상대 단어에 80%만큼 집중해라"*라는 <b>단순 숫자/비율일 뿐 실제 내용물 데이터가 없음!</b></li>
+                            <li><b>Value (\(V\)):</b> **"실제 추출할 내용물 재료"**<br>➔ 단어가 실제로 품고 있는 구체적인 의미 데이터 내용물.</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card card-v">
+                        <div class="card-title">🍲 2. Value를 곱해야 하는 이유 (가중합)</div>
+                        <p style="font-size: 0.88rem; line-height: 1.6;">
+                            점수(숫자)는 단지 비율에 불과하므로, **실제 의미 내용물(\(V\))에 이 비율(Score)을 곱해 가중합(Weighted Sum)**을 취해야 비로소 주변 문맥이 믹싱된 **최종 문맥 벡터(Context Vector)**가 완성됩니다!
+                        </p>
+                    </div>
+                </div>
+
+                <div class="info-card card-hw">
+                    <div class="card-title">📐 3. Value 행렬 크기의 비밀 (\(4 \times 2 \rightarrow 1 \times 2\))</div>
+                    <p style="font-size: 0.85rem; line-height: 1.6;">
+                        입력 벡터(\(1 \times 4\))에 \(W^V\)(\(4 \times 2\))를 곱하여 \(V_I\)가 **\(1 \times 2\)** 규격 그릇이 되는 이유:<br>
+                        어텐션 점수(비율)와 곱해진 후 최종 출력되는 **문맥 데이터의 규격 크기(\(d_v=2\))를 지정**하기 위함입니다. 2차원으로 깔끔히 규격화되어야 다음 층(Layer)이나 Multi-Head 결합 시 병렬로 합성할 수 있습니다.
+                    </p>
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>핵심:</b> Score는 가중치 비율(지시서)이며, 이 비율을 실제 의미 데이터인 Value(V)에 곱해 섞어주어야 비로소 의미 있는 문맥 벡터가 생성됩니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: Word 'LOVE' - Q, K, V Projection Full Math -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>15. 단어 'LOVE'의 \(Q_L, K_L, V_L\) 투영 수치 계산</span>
+                    <span class="slide-title-tag tag-math">Math Step</span>
+                </div>
+                <div class="slide-number">Slide 15 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>단어 <b>'LOVE' (\([0, 1, 0, 1]\))</b>의 \(Q_L, K_L, V_L\) 변환 행렬 곱 풀이 과정입니다.</p>
+
+                <div class="math-box" style="font-size: 0.88rem; text-align: left; line-height: 1.8;">
+                    <b>① Query (\(Q_L\)):</b><br>
+                    \(Q_L = [0,1,0,1] \begin{bmatrix} 1&0 \\ 0&1 \\ 0&0 \\ 0&0 \end{bmatrix} = [0\times1+1\times0+0\times0+1\times0, \; 0\times0+1\times1+0\times0+1\times0] = \mathbf{\textcolor{#38bdf8}{[0, 1]}}\)<br><br>
+                    
+                    <b>② Key (\(K_L\)):</b><br>
+                    \(K_L = [0,1,0,1] \begin{bmatrix} 1&0 \\ 0&1 \\ 0&0 \\ 0&0 \end{bmatrix} = [0\times1+1\times0+0\times0+1\times0, \; 0\times0+1\times1+0\times0+1\times0] = \mathbf{\textcolor{#34d399}{[0, 1]}}\)<br><br>
+                    
+                    <b>③ Value (\(V_L\)):</b><br>
+                    \(V_L = [0,1,0,1] \begin{bmatrix} 0&0 \\ 0&0 \\ 1&0 \\ 0&1 \end{bmatrix} = [0\times0+1\times0+0\times1+1\times0, \; 0\times0+1\times0+0\times0+1\times1] = \mathbf{\textcolor{#c084fc}{[0, 1]}}\)
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>결과:</b> 단어 'LOVE'는 질문 $Q_L=[0,1]$, 키 $K_L=[0,1]$, 내용 데이터 $V_L=[0,1]$로 투영되었습니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: Word 'LOVE' - Self Attention Step -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>16. 단어 'LOVE' 자기 자신과의 Self-Attention 연산</span>
+                    <span class="slide-title-tag tag-concept">Self-Attention</span>
+                </div>
+                <div class="slide-number">Slide 16 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>단어 'LOVE'의 질문(\(Q_L\))과 자신의 키(\(K_L\))를 곱해 자기 자신과의 관심도 점수를 구합니다.</p>
+
+                <div class="grid-2col">
+                    <div class="info-card card-score">
+                        <div class="card-title">🎯 1. 관심도 내적 점수 (Score)</div>
+                        <div class="math-box" style="font-size: 0.9rem;">
+                            $$\text{Score} = Q_L \cdot K_L^T = [0, 1] \cdot [0, 1]^T$$
+                            $$= (0 \times 0) + (1 \times 1) = \mathbf{1.0}$$
+                        </div>
+                        <p style="font-size: 0.85rem; margin-top: 5px;">"LOVE 자신의 질문과 열쇠가 100% 일치하여 점수 1.0 형성!"</p>
+                    </div>
+
+                    <div class="info-card card-v">
+                        <div class="card-title">📦 2. Value 곱산 Output</div>
+                        <div class="math-box" style="font-size: 0.9rem;">
+                            $$\text{Output}_L = \text{Score} \times V_L = 1.0 \times [0, 1]$$
+                            $$= \mathbf{\textcolor{#c084fc}{[0, 1]}}$$
+                        </div>
+                        <p style="font-size: 0.85rem; margin-top: 5px;">단어 'LOVE'의 어텐션 결과 자기 자신의 내용 데이터가 그대로 유지됩니다.</p>
+                    </div>
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>분석:</b> 'LOVE' 역시 독자적으로 연산할 때 자기 자신과 1.0의 완전 연결을 보여줍니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 17: Word 'YOU' - Q, K, V Projection Full Math -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>17. 단어 'YOU'의 \(Q_Y, K_Y, V_Y\) 투영 수치 계산</span>
+                    <span class="slide-title-tag tag-math">Math Step</span>
+                </div>
+                <div class="slide-number">Slide 17 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>단어 <b>'YOU' (\([1, 1, 0, 0]\))</b>의 \(Q_Y, K_Y, V_Y\) 변환 행렬 곱 풀이 과정입니다.</p>
+
+                <div class="math-box" style="font-size: 0.88rem; text-align: left; line-height: 1.8;">
+                    <b>① Query (\(Q_Y\)):</b><br>
+                    \(Q_Y = [1,1,0,0] \begin{bmatrix} 1&0 \\ 0&1 \\ 0&0 \\ 0&0 \end{bmatrix} = [1\times1+1\times0+0\times0+0\times0, \; 1\times0+1\times1+0\times0+0\times0] = \mathbf{\textcolor{#38bdf8}{[1, 1]}}\)<br><br>
+                    
+                    <b>② Key (\(K_Y\)):</b><br>
+                    \(K_Y = [1,1,0,0] \begin{bmatrix} 1&0 \\ 0&1 \\ 0&0 \\ 0&0 \end{bmatrix} = [1\times1+1\times0+0\times0+0\times0, \; 1\times0+1\times1+0\times0+0\times0] = \mathbf{\textcolor{#34d399}{[1, 1]}}\)<br><br>
+                    
+                    <b>③ Value (\(V_Y\)):</b><br>
+                    \(V_Y = [1,1,0,0] \begin{bmatrix} 0&0 \\ 0&0 \\ 1&0 \\ 0&1 \end{bmatrix} = [1\times0+1\times0+0\times1+0\times0, \; 1\times0+1\times0+0\times0+0\times1] = \mathbf{\textcolor{#c084fc}{[0, 0]}}\)
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>결과:</b> 단어 'YOU'는 질문 $Q_Y=[1,1]$, 키 $K_Y=[1,1]$, 내용 데이터 $V_Y=[0,0]$로 투영되었습니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 18: Word 'YOU' - Self Attention Step -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>18. 단어 'YOU' 자기 자신과의 Self-Attention 연산</span>
+                    <span class="slide-title-tag tag-concept">Self-Attention</span>
+                </div>
+                <div class="slide-number">Slide 18 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>단어 'YOU'의 질문(\(Q_Y\))과 자신의 키(\(K_Y\))를 곱해 자기 자신과의 관심도 점수를 구합니다.</p>
+
+                <div class="grid-2col">
+                    <div class="info-card card-score">
+                        <div class="card-title">🎯 1. 관심도 내적 점수 (Score)</div>
+                        <div class="math-box" style="font-size: 0.9rem;">
+                            $$\text{Score} = Q_Y \cdot K_Y^T = [1, 1] \cdot [1, 1]^T$$
+                            $$= (1 \times 1) + (1 \times 1) = \mathbf{2.0}$$
+                        </div>
+                        <p style="font-size: 0.85rem; margin-top: 5px;">"YOU는 성분이 2개 포함되어 점수가 2.0 형성!"</p>
+                    </div>
+
+                    <div class="info-card card-v">
+                        <div class="card-title">📦 2. Value 곱산 Output</div>
+                        <div class="math-box" style="font-size: 0.9rem;">
+                            $$\text{Output}_Y = \text{Score} \times V_Y = 2.0 \times [0, 0]$$
+                            $$= \mathbf{\textcolor{#c084fc}{[0, 0]}}$$
+                        </div>
+                        <p style="font-size: 0.85rem; margin-top: 5px;">점수가 2.0이어도 Value 내용 데이터가 [0,0]이므로 출력이 [0,0]이 됩니다.</p>
+                    </div>
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>확인 완료:</b> 3개 단어(I, LOVE, YOU) 모두 개별 $Q, K, V$ 생성 수식과 내적 점수가 완전히 검증되었습니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 19: Full Sentence "I LOVE YOU" Matrix QK^T & Intuitive Interpretation -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>19. "I LOVE YOU" 어텐션 행렬 내적 (\(QK^T\))의 수치별 의미</span>
+                    <span class="slide-title-tag tag-math">Matrix Attention</span>
+                </div>
+                <div class="slide-number">Slide 19 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>3개 단어의 어텐션 행렬 내적 결과인 <b>\(QK^T\) 성분 수치</b>가 왜 1이고 0이며 2인지를 살펴봅시다.</p>
+
+                <div class="math-box" style="font-size: 0.88rem; text-align: center;">
+                    $$QK^T = \begin{bmatrix} Q_I \\ Q_L \\ Q_Y \end{bmatrix} \begin{bmatrix} K_I & K_L & K_Y \end{bmatrix} = \begin{bmatrix} 1 & 0 \\ 0 & 1 \\ 1 & 1 \end{bmatrix} \begin{bmatrix} 1 & 0 & 1 \\ 0 & 1 & 1 \end{bmatrix} = \begin{bmatrix} \mathbf{1} & \mathbf{0} & \mathbf{1} \\ \mathbf{0} & \mathbf{1} & \mathbf{1} \\ \mathbf{1} & \mathbf{1} & \mathbf{2} \end{bmatrix}$$
+                </div>
+
+                <div class="grid-2col">
+                    <div class="info-card card-q">
+                        <div class="card-title">🔍 Row 1 ('I' 단어의 질문 $Q_I=[1,0]$)</div>
+                        <ul style="margin-left: 15px; font-size: 0.85rem; line-height: 1.6;">
+                            <li><b>1행 1열 (\(\mathbf{1}\)점):</b> \(Q_I \cdot K_I^T = [1,0]\cdot[1,0]^T = \mathbf{1}\)<br>➔ *"자기 자신('I')과의 키가 일치하여 유사도 1점!"*</li>
+                            <li><b>1행 2열 (\(\mathbf{0}\)점):</b> \(Q_I \cdot K_L^T = [1,0]\cdot[0,1]^T = \mathbf{0}\)<br>➔ *"I의 질문과 LOVE의 키([0,1])가 엇갈려 유사도 0점!"*</li>
+                            <li><b>1행 3열 (\(\mathbf{1}\)점):</b> \(Q_I \cdot K_Y^T = [1,0]\cdot[1,1]^T = \mathbf{1}\)<br>➔ *"I의 질문 성분이 YOU의 키에 포함되어 연관성 1점!"*</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card card-k">
+                        <div class="card-title">🔍 Row 3 ('YOU' 단어의 질문 $Q_Y=[1,1]$)</div>
+                        <ul style="margin-left: 15px; font-size: 0.85rem; line-height: 1.6;">
+                            <li><b>3행 1열 (\(\mathbf{1}\)점):</b> \(Q_Y \cdot K_I^T = [1,1]\cdot[1,0]^T = \mathbf{1}\) (I와 1점)</li>
+                            <li><b>3행 2열 (\(\mathbf{1}\)점):</b> \(Q_Y \cdot K_L^T = [1,1]\cdot[0,1]^T = \mathbf{1}\) (LOVE와 1점)</li>
+                            <li><b>3행 3열 (\(\mathbf{2}\)점):</b> \(Q_Y \cdot K_Y^T = [1,1]\cdot[1,1]^T = 1+1 = \mathbf{2}\)<br>➔ *"YOU의 2개 질문 성분이 키와 모두 일치하여 2점 타격!"*</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>개념 완성:</b> 어텐션 행렬 $QK^T$의 각 수치는 각 단어의 질문(Query)과 상대 단어의 열쇠(Key)가 얼마나 맞물리는가를 나타내는 직관적인 내적 유사도 점수표입니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 20: Isolated 'I' Meets Context - Evolution of Attention Score -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>20. [종합 1/3] 혼자 있던 'I'가 문맥을 만나는 순간</span>
+                    <span class="slide-title-tag tag-concept">QKV Synthesis</span>
+                </div>
+                <div class="slide-number">Slide 20 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>독립 단어 벡터였던 'I'가 어텐션 연산 \([1, 0, 1]\)을 통해 **문맥에 반응하는 단어로 변신하는 핵심 원리**입니다.</p>
+
+                <div class="grid-2col">
+                    <div class="info-card card-hw">
+                        <div class="card-title">🧍 1. Before: 혼자 있던 외토리 단어 'I'</div>
+                        <div class="code-inline" style="display:block; margin:6px 0; font-size:0.95rem;">
+                            \(X_I = [1, \, 0, \, 1, \, 0]\) (사전적 고정 벡터)
+                        </div>
+                        <p style="font-size: 0.85rem; line-height: 1.6;">
+                            주변 문맥("love you")이 무엇이든 항상 똑같은 뜻을 갖는 외롭고 고정된 4차원 데이터에 불과했습니다.
+                        </p>
+                    </div>
+
+                    <div class="info-card card-score">
+                        <div class="card-title">🌐 2. After: 어텐션 스코어 1행 \([1, 0, 1]\) 변신</div>
+                        <div class="math-box" style="font-size:0.9rem; margin:6px 0;">
+                            \(Q_I \cdot K^T = \mathbf{\textcolor{#fbbf24}{[1, \; 0, \; 1]}} \quad (\text{I}, \; \text{LOVE}, \; \text{YOU})\)
+                        </div>
+                        <p style="font-size: 0.85rem; line-height: 1.6;">
+                            • <b>\(I \rightarrow I\) (1점, 높음):</b> 주어인 자기 자신과 강한 어텐션!<br>
+                            • <b>\(I \rightarrow LOVE\) (0점, 낮음):</b> 동사 LOVE와는 상대적으로 어텐션 떨어짐.<br>
+                            • <b>\(I \rightarrow YOU\) (1점, 높음):</b> 목적어 YOU와 강한 어텐션!
+                        </p>
+                    </div>
+                </div>
+
+                <div class="info-card card-q">
+                    <div class="card-title">💡 어텐션 스코어 \([1, 0, 1]\)의 수치적 극적 의미</div>
+                    <p style="font-size: 0.9rem;">
+                        단어 'I'는 혼자 있던 사전적 의미에서 벗어나, <b>"나($I$)와 목적어($YOU$)에 강하게 어텐션을 기울이고 $LOVE$는 낮추어 바라보라"</b>는 전체 문장에 맞춘 **관심도 스칼라 집합**으로 진화했습니다!
+                    </p>
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>종합 1단계:</b> QK^T의 1행 [1,0,1]은 단순히 점수가 아니라, 문장 속에서 I가 누구를 얼마나 주의 깊게(Attention) 보아야 하는지의 지도로 변신한 것입니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 21: Multiplying Value (V) to Complete Real Context Vector -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>21. [종합 2/3] 점수판 \([1,0,1]\)에 Value(V)를 곱해 '진짜 문맥 정보' 완성하기</span>
+                    <span class="slide-title-tag tag-math">QKV Synthesis</span>
+                </div>
+                <div class="slide-number">Slide 21 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>점수판 \([1,0,1]\)은 비율(지시서)일 뿐입니다. 여기에 **의미 실체인 Value(\(V\))를 곱해 가중합**을 완성합니다.</p>
+
+                <div class="math-box" style="font-size: 0.95rem; text-align: center; line-height: 1.8;">
+                    $$\text{Output}_I = \text{Score}_I \times V = [1, \; 0, \; 1] \begin{bmatrix} V_I \\ V_L \\ V_Y \end{bmatrix} = [1, \; 0, \; 1] \begin{bmatrix} [0, 1] \\ [0, 1] \\ [0, 0] \end{bmatrix}$$
+                    $$= 1 \times [0, 1] + 0 \times [0, 1] + 1 \times [0, 0] = \mathbf{\textcolor{#c084fc}{[0, 1]}}$$
+                </div>
+
+                <div class="grid-2col">
+                    <div class="info-card card-score">
+                        <div class="card-title">📜 1. 어텐션 스코어 점수판 \([1, 0, 1]\)</div>
+                        <p style="font-size: 0.85rem; line-height: 1.6;">
+                            "I 정보 100% 믹싱 + LOVE 정보 0% 믹싱 + YOU 정보 100% 믹싱하라"는 가중치 지시서입니다.
+                        </p>
+                    </div>
+
+                    <div class="info-card card-v">
+                        <div class="card-title">📦 2. Value(\(V\)) 결합을 통한 실체 완성</div>
+                        <p style="font-size: 0.85rem; line-height: 1.6;">
+                            지시서 비율에 맞춰 실제 내용물 \(V_I([0,1])\), \(V_L([0,1])\), \(V_Y([0,0])\)를 더해줌으로써 비로소 **실제 문맥 정보가 담긴 수치 벡터 \([0, 1]\)**로 완성됩니다!
+                        </p>
+                    </div>
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>종합 2단계:</b> 숫자에 불과했던 스코어 [1,0,1]에 진짜 정보인 V를 곱해야만 의미를 지닌 '진짜 문맥 정보 벡터'가 됩니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 22: 4-Step Self-Attention Process Master Map -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>22. [종합 3/3] Self-Attention 4단계 핵심 프로세스 한눈에 보기</span>
+                    <span class="slide-title-tag tag-concept">Master Map</span>
+                </div>
+                <div class="slide-number">Slide 22 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>단어 'I'가 문맥 벡터로 거듭나는 **Self-Attention 4단계 프로세스 총정리 맵**입니다.</p>
+
+                <div class="grid-2col">
+                    <div class="info-card card-q">
+                        <div class="card-title">Step 1. 입력 벡터 ($X_I$)</div>
+                        <div class="code-inline" style="display:block; margin:4px 0;">\(X_I = [1, 0, 1, 0]\)</div>
+                        <p style="font-size: 0.83rem;">문장 속에 들어가기 전 사전적 고정 단어 벡터</p>
+                    </div>
+
+                    <div class="info-card card-k">
+                        <div class="card-title">Step 2. Q, K, V 분신 투영</div>
+                        <div class="code-inline" style="display:block; margin:4px 0;">\(Q_I=[1,0], \; K_I=[1,0], \; V_I=[0,1]\)</div>
+                        <p style="font-size: 0.83rem;">공통 가중치 W를 곱해 질문, 열쇠, 내용물로 분신</p>
+                    </div>
+                </div>
+
+                <div class="grid-2col">
+                    <div class="info-card card-score">
+                        <div class="card-title">Step 3. 어텐션 스코어 ($Q_I \cdot K^T$)</div>
+                        <div class="code-inline" style="display:block; margin:4px 0;">\(\text{Score}_I = [1, 0, 1]\)</div>
+                        <p style="font-size: 0.83rem;">전체 문장(I, love, you) 속 개별 주목도 스칼라 집합</p>
+                    </div>
+
+                    <div class="info-card card-v">
+                        <div class="card-title">Step 4. Value 가중합 ($\text{Score} \times V$)</div>
+                        <div class="code-inline" style="display:block; margin:4px 0;">\(\text{Context Vector}_I = [0, 1]\)</div>
+                        <p style="font-size: 0.83rem;">점수 비율로 Value를 섞어 맥락 정보가 완성된 최종 엠베딩!</p>
+                    </div>
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>마스터 맵:</b> 이것이 바로 트랜스포머의 Self-Attention이 단어의 맥락을 살아있는 수치 벡터로 바꾸는 전 과정입니다!
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 23: Full Sentence "I LOVE YOU" Unified Matrix Q, K, V Operation -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>23. 전체 문장 "I LOVE YOU" 한 번에 묶는 Q, K, V 행렬 통합 연산</span>
+                    <span class="slide-title-tag tag-math">Full Matrix Attention</span>
+                </div>
+                <div class="slide-number">Slide 23 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>단어 1개씩이 아닌, <b>문장 전체 3개 단어의 Q, K, V 행렬 곱산(\(3 \times 2\))</b>을 일괄 수행합니다.</p>
+
+                <div class="math-box" style="font-size: 0.88rem; text-align: left; line-height: 1.7;">
+                    <b>① 입력 행렬 \(X_{3 \times 4}\) 의 Q, K, V 행렬 투영 (\(3 \times 2\)):</b><br>
+                    \(Q = X \cdot W^Q = \begin{bmatrix} 1&0&1&0 \\ 0&1&0&1 \\ 1&1&0&0 \end{bmatrix} \begin{bmatrix} 1&0 \\ 0&1 \\ 0&0 \\ 0&0 \end{bmatrix} = \mathbf{\textcolor{#38bdf8}{\begin{bmatrix} 1&0 \\ 0&1 \\ 1&1 \end{bmatrix}_{3 \times 2}}}, \quad K = \mathbf{\textcolor{#34d399}{\begin{bmatrix} 1&0 \\ 0&1 \\ 1&1 \end{bmatrix}_{3 \times 2}}}, \quad V = \mathbf{\textcolor{#c084fc}{\begin{bmatrix} 0&1 \\ 0&1 \\ 0&0 \end{bmatrix}_{3 \times 2}}}\)<br><br>
+
+                    <b>② 문장 전체 3개 단어 어텐션 최종 Output 행렬 (\(QK^T \cdot V\)):</b><br>
+                    \(\text{Output} = QK^T \cdot V = \begin{bmatrix} 1&0&1 \\ 0&1&1 \\ 1&1&2 \end{bmatrix} \begin{bmatrix} 0&1 \\ 0&1 \\ 0&0 \end{bmatrix} = \mathbf{\begin{bmatrix} \textcolor{#c084fc}{[0, 1]} & \leftarrow \text{'I' 의 어텐션 Output} \\ \textcolor{#c084fc}{[0, 1]} & \leftarrow \text{'LOVE' 의 어텐션 Output} \\ \textcolor{#c084fc}{[0, 2]} & \leftarrow \text{'YOU' 의 어텐션 Output} \end{bmatrix}_{3 \times 2}}\)
+                </div>
+
+                <div class="info-card card-hw">
+                    <div class="card-title">🚀 H/W 관점에서의 결정적 장점 (Batched GEMM)</div>
+                    <p style="font-size: 0.85rem;">
+                        단어 개별로 순차 처리하지 않고, 문장 전체 3개 단어를 **단 한 번의 행렬 곱산 GEMM**으로 GPU/NPU 텐서 코어에서 100% 병렬 처리하여 <b>초고속 어텐션 결과 행렬</b>을 완성해냅니다!
+                    </p>
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>자연스러운 연결:</b> 단어 1개식 이해한 개념을 문장 전체 행렬 연산으로 확장하여 트랜스포머의 무서운 병렬 가속 원리를 전달합니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 24: What is Softmax? - Converting Raw Scores to 100% Probability -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>24. [Softmax 1/3] Softmax란 무엇인가? — 거친 수치를 합 1.0(100%) 확률로!</span>
+                    <span class="slide-title-tag tag-math">Softmax Math</span>
+                </div>
+                <div class="slide-number">Slide 24 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>내적 점수 \(QK^T\) (\(1, 0, 2\) 등)는 거친 임의의 점수입니다. <b>Softmax</b>는 이를 **합이 1.0(100%)인 확률 비율**로 변환합니다.</p>
+
+                <div class="math-box" style="font-size: 1.1rem; text-align: center;">
+                    $$\text{Softmax}(z_i) = \frac{e^{z_i}}{\sum_{j} e^{z_j}}$$
+                </div>
+
+                <div class="grid-3col">
+                    <div class="info-card card-q">
+                        <div class="card-title" style="font-size: 0.95rem;">1️⃣ 합이 1.0 (100%) 정규화</div>
+                        <p style="font-size: 0.83rem;">모든 성분의 합이 1이 되어 **"어텐션 비율 지시서"**로 완벽히 작동함.</p>
+                    </div>
+
+                    <div class="info-card card-k">
+                        <div class="card-title" style="font-size: 0.95rem;">2️⃣ 항상 양수 (\(>0\)) 보장</div>
+                        <p style="font-size: 0.83rem;">\(e^z > 0\) 이므로 음수 점수가 와도 안전하게 양수 확률로 정제함.</p>
+                    </div>
+
+                    <div class="info-card card-score">
+                        <div class="card-title" style="font-size: 0.95rem;">3️⃣ 핵심 격차 강조 (Soft-Max)</div>
+                        <p style="font-size: 0.83rem;">지수함수 특성으로 큰 점수에 더 큰 가중치를 부여해 중요 단어를 부각함.</p>
+                    </div>
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>Softmax 개요:</b> 무작위 크기의 거친 숫자를 합이 100%인 확률로 다듬어주는 필수적인 비율 정규화 함수입니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 25: Why Exp(e^x)? - Calculus & Derivative Advantages in Deep Learning -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>25. [Softmax 2/3] 왜 하필 \(e^x\) (자연상수 e)를 쓸까? — 딥러닝 미분의 비밀</span>
+                    <span class="slide-title-tag tag-math">Derivative Secret</span>
+                </div>
+                <div class="slide-number">Slide 25 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>지수함수 중 왜 일반 숫자(\(2^x, 10^x\)) 대신 <b>자연상수 \(e\) (\(e \approx 2.718\))</b>를 사용하는지의 수학적 이점입니다.</p>
+
+                <div class="formula-card" style="font-size: 1.3rem;">
+                    $$\frac{d}{dx} (e^x) = e^x \quad \text{\large(미분을 해도 자기 자신 그대로!)}$$
+                </div>
+
+                <div class="grid-2col">
+                    <div class="info-card card-hw">
+                        <div class="card-title">⚡ 1. 딥러닝 역전파(Backpropagation) 연산 초고속화</div>
+                        <p style="font-size: 0.88rem; line-height: 1.6;">
+                            딥러닝 오차 역전파 학습 시 수억 개의 가중치를 **편미분**해야 합니다.<br>
+                            자연상수 \(e^x\)는 미분 결과가 지저분한 상수가 붙지 않고 **자기 자신(\(e^x\))으로 유도**되어, NPU/GPU 역전파 <b>기울기 계산이 극도로 단순화</b>되고 가속됩니다!
+                        </p>
+                    </div>
+
+                    <div class="info-card card-k">
+                        <div class="card-title">🛡️ 2. 기울기 소멸/폭발 방지 및 수치 안정성</div>
+                        <p style="font-size: 0.88rem; line-height: 1.6;">
+                            지수 미분 특성이 부드럽게 연결되어, 학습 중 기울기가 끊기거나 폭발하지 않는 <b>매끄러운 그래디언트 흐름(Smooth Gradient)</b>을 보장합니다.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>자연상수 e의 이점:</b> (e^x)' = e^x 이라는 놀라운 특성 덕분에 역전파 편미분 계산이 상상할 수 없을 만큼 빨라지고 안정화됩니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 26: Why Softmax on QK^T Product? -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>26. [Softmax 3/3] 그래서 왜 \(QK^T\) 내적 곱 뒤에 Softmax를 적용해야 하는가?</span>
+                    <span class="slide-title-tag tag-concept">Pipeline Connection</span>
+                </div>
+                <div class="slide-number">Slide 26 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>거친 내적 점수판 \(QK^T\)에 <b>Softmax를 씌워 Value(\(V\))와 결합하는 완벽한 파이프라인</b>입니다.</p>
+
+                <div class="pipeline-flow" style="margin: 15px 0;">
+                    <div class="pipeline-step active-step">거친 점수판 \(QK^T\)<br><span style="font-size:0.75rem; color:var(--text-sub);">[1.0, 0.0, 1.0]</span></div>
+                    <div class="pipeline-arrow">→</div>
+                    <div class="pipeline-step active-step" style="border-color:var(--score-color); background:rgba(251,191,36,0.1);">Softmax 확률화<br><span style="font-size:0.75rem; color:var(--score-color);">[0.42, 0.16, 0.42] (합 1.0)</span></div>
+                    <div class="pipeline-arrow">→</div>
+                    <div class="pipeline-step active-step" style="border-color:var(--v-color); background:rgba(192,132,252,0.1);">Value(\(V\)) 가중합<br><span style="font-size:0.75rem; color:var(--v-color);">\(0.42 V_I + 0.16 V_L + 0.42 V_Y\)</span></div>
+                </div>
+
+                <div class="grid-2col">
+                    <div class="info-card card-score">
+                        <div class="card-title">⚠️ Softmax가 없을 때 발생하는 참사</div>
+                        <p style="font-size: 0.85rem;">
+                            Softmax 없이 거친 점수(예: 100, 500)를 그대로 Value에 곱하면, 출력값이 폭발하여 모델 데이터가 완전히 깨지고 학습이 불가능해집니다.
+                        </p>
+                    </div>
+
+                    <div class="info-card card-v">
+                        <div class="card-title">✅ Softmax 적용 후의 완벽한 가중합</div>
+                        <p style="font-size: 0.85rem;">
+                            모든 어텐션 비율의 합이 **정확히 100% (1.0)**로 고정되어, Value 의미 데이터를 $42\% : 16\% : 42\%$ 비율로 **안전하고 정갈하게 가중합**합니다!
+                        </p>
+                    </div>
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>결론:</b> Softmax는 거친 내적 점수 QK^T를 안전한 100% 비율 지시서로 바꾸어 Value(V)를 부드럽게 섞어주는 핵심 장치입니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 27: Scaled Dot-Product Attention -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>27. Scaled Dot-Product Attention & 스케일링</span>
+                    <span class="slide-title-tag tag-math">Math Concept</span>
+                </div>
+                <div class="slide-number">Slide 27 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>Attention 수식의 분모에 들어가는 <b>\(\sqrt{d_k}\) 스케일링</b>은 내적 연산의 수치 안정성을 위해 필수적입니다.</p>
+
+                <div class="math-box">
+                    $$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$
+                </div>
+
+                <div class="info-card card-score">
+                    <div class="card-title">⚠️ 왜 내적 값에 스케일링(\(\div \sqrt{d_k}\))이 필요한가?</div>
+                    <p style="font-size: 0.92rem;">
+                        차원 \(d_k\)가 커지면 내적 값 \(QK^T\)의 분산이 커져 수치가 매우 커집니다. 내적 값이 너무 크면 Softmax 지수 연산 특성상 <b>기울기 소멸(Gradient Vanishing)</b>이 발생하므로 차원 수의 제곱근으로 나누어 정규화합니다.
+                    </p>
+                </div>
+
+                <div class="grid-2col">
+                    <div class="info-card">
+                        <div class="card-title" style="font-size: 0.95rem;">스케일링 전 (\([1, 0, 1]\))</div>
+                        <div class="code-inline">Softmax([1, 0, 1]) → [0.42, 0.16, 0.42]</div>
+                    </div>
+                    <div class="info-card card-k">
+                        <div class="card-title" style="font-size: 0.95rem;">스케일링 후 (\(\div \sqrt{2} \approx 1.414\))</div>
+                        <div class="code-inline">Softmax([0.707, 0, 0.707]) → [0.401, 0.198, 0.401]</div>
+                    </div>
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>결과 효과:</b> 스케일링을 통해 Softmax 출력이 너무 극단적으로 쏠리는 현상을 방지하고 부드러운 가중치 분포를 유지합니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 28: Softmax & Context Vector for 'I' -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>28. 단어 'I'의 Softmax 정규화 & 문맥 벡터 수치 연산</span>
+                    <span class="slide-title-tag tag-concept">Word Step (I)</span>
+                </div>
+                <div class="slide-number">Slide 28 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>단어 'I'의 Query(\(Q_I\))가 전체 문장의 \(K, V\) 행렬과 연산하여 문맥을 흡수합니다.</p>
+
+                <div class="info-card card-v">
+                    <div class="card-title">🔄 단어 'I' 문맥 연산 3단계</div>
+                    <ol style="margin-left: 20px; font-size: 0.9rem; line-height: 1.8;">
+                        <li><b>Dot Product 내적 유사도 (\(Q_I \cdot K^T\)):</b> \([1, 0] \cdot \begin{bmatrix} 1 & 0 & 1 \\ 0 & 1 & 1 \end{bmatrix} = \mathbf{[1, 0, 1]}\)</li>
+                        <li><b>Softmax 확률화:</b> \(\text{Softmax}([1, 0, 1]) = \mathbf{[0.42, \, 0.16, \, 0.42]}\) (I: 42%, love: 16%, you: 42%)</li>
+                        <li><b>Value 가중합 (Context Vector):</b><br>
+                            \(0.42 \times [0,1] + 0.16 \times [0,1] + 0.42 \times [0,0] = \mathbf{\textcolor{#c084fc}{[0.16, \, 0.42]}}\)
+                        </li>
+                    </ol>
+                </div>
+
+                <p style="font-size: 0.95rem;">단어 'I'의 새로운 벡터 \([0.16, 0.42]\)는 단순 'I'의 의미를 넘어 <b>'love'의 16%, 'you'의 42% 문맥이 융합된 맥락 벡터</b>로 업데이트됩니다.</p>
+
+                <div class="speaker-note">
+                    💡 <b>Self-Attention의 본질:</b> 단어가 고정된 뜻에 갇혀있지 않고 주변 단어들의 가중치를 곱해 맥락에 따라 새로운 의미로 재탄생합니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 29: Softmax & Context Vector for 'LOVE' -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>29. 단어 'LOVE'의 Softmax 정규화 & 문맥 벡터 수치 연산</span>
+                    <span class="slide-title-tag tag-concept">Word Step (LOVE)</span>
+                </div>
+                <div class="slide-number">Slide 29 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>단어 'LOVE'의 Query(\(Q_L=[0,1]\))가 전체 문장의 \(K, V\) 행렬과 연산하여 문맥을 흡수합니다.</p>
+
+                <div class="info-card card-v">
+                    <div class="card-title">🔄 단어 'LOVE' 문맥 연산 3단계</div>
+                    <ol style="margin-left: 20px; font-size: 0.9rem; line-height: 1.8;">
+                        <li><b>Dot Product 내적 유사도 (\(Q_L \cdot K^T\)):</b> \([0, 1] \cdot \begin{bmatrix} 1 & 0 & 1 \\ 0 & 1 & 1 \end{bmatrix} = \mathbf{[0, 1, 1]}\)</li>
+                        <li><b>Softmax 확률화:</b> \(\text{Softmax}([0, 1, 1]) = \mathbf{[0.16, \, 0.42, \, 0.42]}\) (I: 16%, love: 42%, you: 42%)</li>
+                        <li><b>Value 가중합 (Context Vector):</b><br>
+                            \(0.16 \times [0,1] + 0.42 \times [0,1] + 0.42 \times [0,0] = \mathbf{\textcolor{#c084fc}{[0.16, \, 0.58]}}\)
+                        </li>
+                    </ol>
+                </div>
+
+                <p style="font-size: 0.95rem;">단어 'LOVE'의 새로운 벡터 \([0.16, 0.58]\)는 <b>주어 'I'의 16%, 목적어 'you'의 42% 문맥이 결합된 풍부한 가동사 벡터</b>로 변신합니다.</p>
+
+                <div class="speaker-note">
+                    💡 <b>분석:</b> 'LOVE'는 자신(42%)과 목적어 YOU(42%)에 동일하게 높은 주의를 기울여 최종 [0.16, 0.58] 문맥 출력을 형성합니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 30: Softmax & Context Vector for 'YOU' -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>30. 단어 'YOU'의 Softmax 정규화 & 문맥 벡터 수치 연산</span>
+                    <span class="slide-title-tag tag-concept">Word Step (YOU)</span>
+                </div>
+                <div class="slide-number">Slide 30 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>단어 'YOU'의 Query(\(Q_Y=[1,1]\))가 전체 문장의 \(K, V\) 행렬과 연산하여 문맥을 흡수합니다.</p>
+
+                <div class="info-card card-v">
+                    <div class="card-title">🔄 단어 'YOU' 문맥 연산 3단계</div>
+                    <ol style="margin-left: 20px; font-size: 0.9rem; line-height: 1.8;">
+                        <li><b>Dot Product 내적 유사도 (\(Q_Y \cdot K^T\)):</b> \([1, 1] \cdot \begin{bmatrix} 1 & 0 & 1 \\ 0 & 1 & 1 \end{bmatrix} = \mathbf{[1, 1, 2]}\)</li>
+                        <li><b>Softmax 확률화:</b> \(\text{Softmax}([1, 1, 2]) = \mathbf{[0.21, \, 0.21, \, 0.58]}\) (I: 21%, love: 21%, you: 58%)</li>
+                        <li><b>Value 가중합 (Context Vector):</b><br>
+                            \(0.21 \times [0,1] + 0.21 \times [0,1] + 0.58 \times [0,0] = \mathbf{\textcolor{#c084fc}{[0.21, \, 0.42]}}\)
+                        </li>
+                    </ol>
+                </div>
+
+                <p style="font-size: 0.95rem;">단어 'YOU'의 새로운 벡터 \([0.21, 0.42]\)는 <b>자기 자신(58%)과 주어 I(21%), 동사 love(21%)의 맥락이 조화롭게 통합된 목적어 벡터</b>가 됩니다.</p>
+
+                <div class="speaker-note">
+                    💡 <b>분석:</b> 'YOU'의 내적 스코어 2.0이 Softmax를 통과해 58%의 안전한 확률 지시서로 변환되는 과정을 증명했습니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 31: Dramatic Comparison - Softmax Raw vs Softmax Applied -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>31. Softmax 적용 전(Slide 23) vs 적용 후(Slide 28~30) 극적 비교</span>
+                    <span class="slide-title-tag tag-math">Comparison</span>
+                </div>
+                <div class="slide-number">Slide 31 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>내적 스코어를 그대로 곱했을 때와 <b>Softmax 정규화를 거쳤을 때의 문맥 행렬 결과 비교</b>입니다.</p>
+
+                <div class="grid-2col">
+                    <div class="info-card card-hw">
+                        <div class="card-title">❌ Softmax 적용 전 (Slide 23 거친 스코어)</div>
+                        <div class="math-box" style="font-size: 0.85rem; margin: 6px 0;">
+                            $$\text{Output}_{\text{raw}} = \begin{bmatrix} 1&0&1 \\ 0&1&1 \\ 1&1&2 \end{bmatrix} \begin{bmatrix} 0&1 \\ 0&1 \\ 0&0 \end{bmatrix} = \mathbf{\begin{bmatrix} [0, 1] \\ [0, 1] \\ [0, 2] \end{bmatrix}}$$
+                        </div>
+                        <ul style="margin-left: 15px; font-size: 0.82rem; line-height: 1.6;">
+                            <li>비율 정규화가 없어 수치가 배수로 무제한 튐.</li>
+                            <li>단어 간 미세한 문맥 혼합 비율을 세밀하게 반영 불가.</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card card-v">
+                        <div class="card-title">✅ Softmax 적용 후 (Slide 28~30 완벽 정규화)</div>
+                        <div class="math-box" style="font-size: 0.85rem; margin: 6px 0;">
+                            $$\text{Output}_{\text{softmax}} = \begin{bmatrix} 0.42&0.16&0.42 \\ 0.16&0.42&0.42 \\ 0.21&0.21&0.58 \end{bmatrix} \begin{bmatrix} 0&1 \\ 0&1 \\ 0&0 \end{bmatrix} = \mathbf{\begin{bmatrix} [0.16, 0.42] \\ [0.16, 0.58] \\ [0.21, 0.42] \end{bmatrix}}$$
+                        </div>
+                        <ul style="margin-left: 15px; font-size: 0.82rem; line-height: 1.6;">
+                            <li>100% 확률 비율 아래에서 부드럽게 가중합됨.</li>
+                            <li>모든 단어가 문맥 정보를 품은 **진짜 맥락 벡터**로 진화!</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>핵심 정리:</b> Softmax 적용 전과 후를 비교해보면, 정규화를 거침으로써 비로소 모든 단어가 100% 비율 지시서 아래 부드럽고 안전하게 문맥을 나누어 가짐을 확인할 수 있습니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 32 [NEW]: LLM 2 Execution Phases - Prefill vs Decoding Phase -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>32. LLM의 2가지 동작 단계 — Prefill vs Decoding Phase</span>
+                    <span class="slide-title-tag tag-hw">LLM Execution</span>
+                </div>
+                <div class="slide-number">Slide 32 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>LLM 추론 실행은 동작 특성과 H/W 요구사항이 완전히 다른 <b>2가지 단계(Phase)</b>로 나뉩니다.</p>
+
+                <div class="grid-2col">
+                    <div class="info-card card-q">
+                        <div class="card-title">1️⃣ Prefill Phase (프롬프트 한 번에 연산)</div>
+                        <ul style="margin-left: 15px; font-size: 0.88rem; line-height: 1.7;">
+                            <li>사용자가 입력한 문장(프롬프트) 전체 토큰을 <b>한 번에 입력받아 행렬 곱(GEMM) 수행</b>.</li>
+                            <li>모든 토큰의 \(Q, K, V\)가 동시에 대규모로 생성됨.</li>
+                            <li><b>H/W 특성:</b> <span class="hl-q">Compute-Bound</span> (GPU/NPU 연산 코어가 100% 풀 가동!).</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card card-hw">
+                        <div class="card-title">2️⃣ Decoding Phase (토큰 1개씩 순차 생성)</div>
+                        <ul style="margin-left: 15px; font-size: 0.88rem; line-height: 1.7;">
+                            <li>다음 단어 토큰을 <b>1개씩 Autoregressive로 순차 생성</b> (Sequence Generation).</li>
+                            <li>새로 생성된 1개 토큰의 Query가 **이전 모든 토큰의 Key, Value를 참조**.</li>
+                            <li><b>H/W 특성:</b> <span class="hl-hw">Memory-Bandwidth Bound</span> (연산보다 메모리 로딩 속도가 지배!).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>핵심 구분:</b> Prefill은 거대한 행렬 연산(Compute-Bound)이고, Decoding은 이전 토큰 데이터를 계속 읽어야 하는 메모리 병목(Memory-Bound) 단계입니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 33 [NEW]: Why KV Cache is Essential? - Latency & Efficiency -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>33. 왜 KV Cache가 필연적으로 필요한가? — 속도와 연산 효율</span>
+                    <span class="slide-title-tag tag-hw">KV Cache Purpose</span>
+                </div>
+                <div class="slide-number">Slide 33 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>Decoding 단계에서 토큰 1개를 생성할 때 <b>KV Cache가 없을 때 발생하는 재계산의 비극</b>입니다.</p>
+
+                <div class="grid-2col">
+                    <div class="info-card card-hw">
+                        <div class="card-title">❌ KV Cache가 없을 때 (재계산의 비극)</div>
+                        <p style="font-size: 0.85rem; line-height: 1.6;">
+                            100번째 단어를 생성할 때, 앞선 **99개 단어의 Key와 Value를 처음부터 다시 재계산**해야 합니다!<br>
+                            ➔ 토큰이 길어질수록 계산량이 \(O(N^2)\)으로 폭발하여 **추론 속도(Latency)가 멸망**하고 연산 코어가 낭비됩니다.
+                        </p>
+                    </div>
+
+                    <div class="info-card card-k">
+                        <div class="card-title">✅ KV Cache가 있을 때 (속도 & 효율 혁신)</div>
+                        <p style="font-size: 0.85rem; line-height: 1.6;">
+                            이전 99개 단어의 Key, Value를 **HBM 메모리에 저장(Cache)해 두고 재사용**합니다!<br>
+                            ➔ 새로 생성된 토큰 1개의 \(K, V\)만 캐시에 덧붙이므로(Row Append) **초당 생성 토큰 수(TPS)가 극대화**됩니다.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="formula-card" style="font-size: 1.1rem; padding: 14px;">
+                    🚀 KV Cache = 이전 토큰 K, V 재계산 100% 제거 ➔ 추론 속도(Latency) 극대화 + H/W 연산 효율 확보
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>도입 이유:</b> KV Cache는 단순한 메모리 기법이 아니라, LLM이 실시간 대화 서비스(ChatGPT 등)를 가능하게 만든 결정적 하드웨어 추론 혁신입니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 34 [NEW]: LLM Training Memory vs LLM Serving/Inference Memory -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>34. LLM '학습(Training)' vs '서비스/추론(Serving)' 메모리 구조 비교</span>
+                    <span class="slide-title-tag tag-hw">Memory Economics</span>
+                </div>
+                <div class="slide-number">Slide 34 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>LLM 개발 단계별로 HBM 메모리를 점유하는 **핵심 요소와 메모리 구조의 결정적 차이점**입니다.</p>
+
+                <div class="grid-2col">
+                    <div class="info-card card-q">
+                        <div class="card-title">🏋️ 1. LLM 학습(Training) 메모리 구조</div>
+                        <ul style="margin-left: 15px; font-size: 0.85rem; line-height: 1.7;">
+                            <li><b>가중치 (Weights):</b> 70B 모델 기준 ~140GB</li>
+                            <li><b>기울기 (Gradients):</b> ~140GB</li>
+                            <li><b>옵티마이저 상태 (Optimizer States):</b> ~560GB (Adam 기준)</li>
+                            <li><b>특성:</b> 모델 파라미터와 기울기에 정비례하는 **고정된 연산 중심 메모리 점유**.</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card card-v">
+                        <div class="card-title">🌐 2. LLM 서비스/추론(Serving) 메모리 구조</div>
+                        <ul style="margin-left: 15px; font-size: 0.85rem; line-height: 1.7;">
+                            <li><b>가중치 (Weights):</b> 70B 모델 기준 ~140GB (고정)</li>
+                            <li><b>KV Cache 메모리:</b> <span class="hl-hw">동시 사용자 수(Concurrent Users) × 컨텍스트 길이에 가변적 폭증!</span></li>
+                            <li><b>특성:</b> 사용자가 접속할수록 **KV Cache가 메모리를 지배**.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>구분:</b> 학습 메모리는 모델 크기와 옵티마이저에 묶이지만, 서비스 메모리는 동시 접속 사용자 수에 직접 비례하여 변동합니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 35 [NEW]: User Explosion & KV Cache HBM Memory Surge -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>35. 사용자가 늘수록 KV Cache 폭발 — "학습이 끝나도 HBM이 거대하게 필요한 이유!"</span>
+                    <span class="slide-title-tag tag-hw">HBM Scaling</span>
+                </div>
+                <div class="slide-number">Slide 35 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>모델 학습이 완료되어 가중치 크기가 고정되어도 <b>서비스 사용자가 증가할 때 발생하는 HBM 폭발 현상</b>입니다.</p>
+
+                <div class="info-card card-hw">
+                    <div class="card-title">🔥 극단적 서비스 통찰: 학습이 끝나도 HBM은 끊임없이 부족하다!</div>
+                    <p style="font-size: 0.9rem; line-height: 1.7;">
+                        "더 이상 모델 학습(Training)이 진행되지 않아 <b>가중치 크기(예: 140GB)가 완벽히 고정</b>되더라도, LLM 서비스를 이용하는 동시 사용자가 <b>1,000명 $\rightarrow$ 10,000명 $\rightarrow$ 100,000명으로 폭증</b>하면 KV Cache가 사용하는 메모리가 <b>수천 GB 이상으로 폭발적인 비례 증가</b>를 하게 됩니다!"
+                    </p>
+                </div>
+
+                <div class="grid-2col">
+                    <div class="info-card card-q">
+                        <div class="card-title">📊 사용자 100명 접속 시</div>
+                        <div class="code-inline">KV Cache ≈ 수십 GB (Single GPU로 가능)</div>
+                    </div>
+                    <div class="info-card card-score">
+                        <div class="card-title">🚀 동시 사용자 10,000명 접속 시</div>
+                        <div class="code-inline">KV Cache ≈ 수백 ~ 수천 GB (HBM Cluster 필수!)</div>
+                    </div>
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>서비스 핵심:</b> LLM 인프라 사업자 입장에서 HBM 메모리 구매 비용의 대부분은 가중치 저장보다 동시 접속 유저들의 KV Cache를 감당하기 위함입니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 36 [NEW]: HBM Capacity vs HBM Bandwidth -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>36. H/W 병목의 핵심: HBM 용량(Capacity) vs HBM 대역폭(Bandwidth)</span>
+                    <span class="slide-title-tag tag-hw">HBM Dual Limits</span>
+                </div>
+                <div class="slide-number">Slide 36 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>LLM 추론 서비스 시 HBM 메모리가 요구받는 <b>두 가지 상이한 물리적 한계</b>입니다.</p>
+
+                <div class="grid-2col">
+                    <div class="info-card card-q">
+                        <div class="card-title">📦 1. HBM 용량 (Capacity - GB/TB)</div>
+                        <ul style="margin-left: 15px; font-size: 0.88rem; line-height: 1.7;">
+                            <li><b>역할:</b> 수만 명 접속 유저의 거대한 **KV Cache 데이터를 물리적으로 담아두는 그릇의 크기**.</li>
+                            <li><b>부족 시 현상:</b> Out of Memory (OOM) 에러 발생 및 동시 처리 가능 사용자 수(Batch Size) 제한.</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card card-hw">
+                        <div class="card-title">🏎️ 2. HBM 대역폭 (Bandwidth - TB/s)</div>
+                        <ul style="margin-left: 15px; font-size: 0.88rem; line-height: 1.7;">
+                            <li><b>역할:</b> Decoding Phase에서 토큰 1개 생성 시마다 **HBM 내 KV Cache를 GPU/NPU SRAM으로 읽어오는 전송 속도**.</li>
+                            <li><b>부족 시 현상:</b> 연산 코어가 놀고 **토큰 생성 속도(TPS)가 대폭 둔화**.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="formula-card" style="font-size: 1.05rem; padding: 12px;">
+                    ⚡ LLM 추론 H/W의 성패 = HBM 용량 (다수 유저 수용) × HBM 대역폭 (초당 토큰 생성 속도)
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>대역폭의 중요성:</b> 아무리 HBM 용량이 커도 읽기 대역폭(TB/s)이 좁으면 문장 생성 속도가 느려져 서비스 품질이 떨어집니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 37 [NEW]: H/W Optimization Summary - FlashAttention, PagedAttention, Quantization -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>37. [H/W 요약] Roofline 모델 & LLM Serving H/W 엔지니어링 3대 지침</span>
+                    <span class="slide-title-tag tag-hw">H/W Optimization</span>
+                </div>
+                <div class="slide-number">Slide 37 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>Decoding의 메모리 병목을 극복하기 위한 **현대 LLM H/W 최적화 핵심 기술 3가지**입니다.</p>
+
+                <div class="grid-3col">
+                    <div class="info-card card-q">
+                        <div class="card-title" style="font-size: 0.95rem;">⚡ FlashAttention</div>
+                        <p style="font-size: 0.83rem; line-height: 1.6;">
+                            SRAM 블록링(Tiling)을 통해 HBM 접근 횟수를 획기적으로 줄여 **HBM 대역폭 병목 극복**.
+                        </p>
+                    </div>
+
+                    <div class="info-card card-k">
+                        <div class="card-title" style="font-size: 0.95rem;">📟 PagedAttention (vLLM)</div>
+                        <p style="font-size: 0.83rem; line-height: 1.6;">
+                            OS의 가상 메모리 페이징 기법을 도입해 KV Cache의 **메모리 파편화를 0%에 가깝게 제거하여 HBM 용량 절감**.
+                        </p>
+                    </div>
+
+                    <div class="info-card card-score">
+                        <div class="card-title" style="font-size: 0.95rem;">📉 Quantization (양자화)</div>
+                        <p style="font-size: 0.83rem; line-height: 1.6;">
+                            KV Cache를 FP16 $\rightarrow$ INT8/INT4로 축소하여 **메모리 용량과 읽기 대역폭 요구량을 1/2~1/4로 절감**.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="info-card card-hw" style="margin-top: 10px;">
+                    <div class="card-title">📢 H/W 엔지니어링 최종 레슨</div>
+                    <p style="font-size: 0.88rem;">
+                        LLM 추론 서비스를 설계할 때는 단순히 NPU/GPU의 연산력(FLOPS)만 볼 것이 아니라, **HBM3e/HBM4의 높은 대역폭과 초대형 HBM 메모리 클러스터 구축**이 사업 성공의 결정적 요소입니다.
+                    </p>
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>요약 완료:</b> KV Cache와 HBM 메모리 대역폭의 중요성을 하드웨어 최적화 3대 지침으로 깔끔히 정리했습니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 38 [NEW MHA 1]: Multi-Head Attention Preview - Why 1 Head is Not Enough -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>38. [추후 세미나 1] Multi-Head Attention — 왜 1개 Head로는 부족한가?</span>
+                    <span class="slide-title-tag tag-concept">Future Topic MHA</span>
+                </div>
+                <div class="slide-number">Slide 38 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>본 세미나에서는 1개 Head로 다루었지만, 실제 트랜스포머는 <b>여러 개의 Head(Multi-Head)</b>를 사용합니다.</p>
+
+                <div class="grid-2col">
+                    <div class="info-card card-score">
+                        <div class="card-title">⚠️ Single-Head Attention의 한계점</div>
+                        <p style="font-size: 0.88rem; line-height: 1.6;">
+                            단 1개의 질문($Q$), 키($K$), 내용($V$) 조합만 사용하면, 단어 간 **단 한 종류의 관계(예: 위치상 가까운 관계)**에만 좁게 집중하게 되어 복잡한 문맥 관계를 놓치게 됩니다.
+                        </p>
+                    </div>
+
+                    <div class="info-card card-q">
+                        <div class="card-title">🌐 Multi-Head Attention (MHA)의 필요성</div>
+                        <p style="font-size: 0.88rem; line-height: 1.6;">
+                            단어를 여러 관점의 서브 공간으로 분할 투영하여, **"문법적 주어-동사 관계", "대명사 지칭 관계", "문맥적 톤/감정 관계"** 등 다채로운 시각을 **동시에 탐색**하기 위해 필수적입니다.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>미리보기 1:</b> Multi-Head Attention은 추후 독립 세미나에서 다룰 주제이며, 본 장에서는 다채로운 시각 탐색이라는 필요성을 제시합니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 39 [NEW MHA 2]: Multi-Head Attention Architecture & Parallel Speedup -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>39. Multi-Head Attention의 다채로운 문맥 탐색 & 병렬 가속 원리</span>
+                    <span class="slide-title-tag tag-concept">MHA Concept</span>
+                </div>
+                <div class="slide-number">Slide 39 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>여러 Head가 독립적으로 추출한 관점들을 하나로 <b>합체(Concat)하고 가중치($W^O$)를 곱해 연산하는 원리</b>입니다.</p>
+
+                <div class="math-box" style="font-size: 0.95rem;">
+                    $$\text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}_1, \text{head}_2, \dots, \text{head}_h) W^O$$
+                </div>
+
+                <div class="grid-3col">
+                    <div class="info-card card-q">
+                        <div class="card-title" style="font-size: 0.95rem;">Head 1: 문법 관점</div>
+                        <p style="font-size: 0.83rem;">주어-동사 결합 포커스 (I → love)</p>
+                    </div>
+
+                    <div class="info-card card-k">
+                        <div class="card-title" style="font-size: 0.95rem;">Head 2: 지칭 관점</div>
+                        <p style="font-size: 0.83rem;">목적어 지칭 관계 포커스 (love → you)</p>
+                    </div>
+
+                    <div class="info-card card-v">
+                        <div class="card-title" style="font-size: 0.95rem;">Head 3: 뉘앙스 관점</div>
+                        <p style="font-size: 0.83rem;">문장 긍정/부정 Tone 융합 포커스</p>
+                    </div>
+                </div>
+
+                <div class="info-card card-hw">
+                    <div class="card-title">🚀 H/W 관점에서의 우수성</div>
+                    <p style="font-size: 0.85rem;">
+                        $h$개 Head의 연산은 서로 완전히 독립적이므로, GPU/NPU Tensor Core에서 **Batched GEMM 병렬 가속**을 통해 아무런 속도 저하 없이 한 번에 계산됩니다.
+                    </p>
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>결론:</b> 독립된 개별 Head들이 추출한 문맥 데이터는 하나로 Concat되어 통일된 대표 문맥 벡터로 재탄생합니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 40 [NEW POS 1]: Positional Encoding Preview - Fatal Weakness of Dot Product -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>40. [추후 세미나 2] Positional Encoding — 어텐션 행렬 곱의 치명적 약점</span>
+                    <span class="slide-title-tag tag-concept">Future Topic Positional</span>
+                </div>
+                <div class="slide-number">Slide 40 / 41</div>
+            </div>
+            <div class="slide-body">
+                <p>트랜스포머의 행렬 곱 어텐션 연산에는 <b>단어의 순서를 모르는 치명적인 약점</b>이 존재합니다.</p>
+
+                <div class="grid-2col">
+                    <div class="info-card card-hw">
+                        <div class="card-title">⚠️ 행렬 곱 내적의 순서 무관성 (Permutation Invariant)</div>
+                        <p style="font-size: 0.88rem; line-height: 1.6;">
+                            내적 연산 $QK^T$는 단순히 성분별 곱의 합이므로, **"I love you"**와 **"You love I"**의 단어 순서가 바뀌어도 내적 점수 결과가 완전히 똑같이 산출됩니다!
+                        </p>
+                    </div>
+
+                    <div class="info-card card-k">
+                        <div class="card-title">🧩 위치 정보 주입 (Positional Encoding)의 필수성</div>
+                        <p style="font-size: 0.88rem; line-height: 1.6;">
+                            언어에서는 단어의 **위치 순서(Position)**가 의미를 결정짓는 핵심이므로, 입력 임베딩 벡터에 **위치를 나타내는 특수 수치 파동(Positional Vector)**을 더해주어야 합니다.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>미리보기 2:</b> 행렬 곱 자체에는 단어의 위치 순서 개념이 없기 때문에 Positional Encoding이 보완 장치로 들어갑니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 41 [NEW POS 2]: Sin/Cos Wave Injection & Seminar Final Summary -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>41. 위치 정보 주입(Sin/Cos 파동)과 세미나 최종 총정리</span>
+                    <span class="slide-title-tag tag-concept">Final Summary</span>
+                </div>
+                <div class="slide-number">Slide 41 / 41</div>
+            </div>
+            <div class="slide-body">
+                <div class="grid-2col">
+                    <div class="info-card card-k">
+                        <div class="card-title">🌊 Sin/Cos 삼각함수 위치 파동</div>
+                        <div class="math-box" style="font-size: 0.75rem; margin: 4px 0;">
+                            \(PE_{(pos, 2i)} = \sin\left(\frac{pos}{10000^{2i/d}}\right), \quad PE_{(pos, 2i+1)} = \cos\left(\frac{pos}{10000^{2i/d}}\right)\)
+                        </div>
+                        <p style="font-size: 0.82rem;">
+                            주기가 다른 삼각함수 파동 수치를 입력 벡터에 Element-wise 더해 단어의 상대적 위치 정보를 모델에 성공적으로 주입합니다.
+                        </p>
+                    </div>
+
+                    <div class="info-card card-hw">
+                        <div class="card-title">📢 전체 세미나 최종 결론 요약</div>
+                        <ul style="margin-left: 15px; font-size: 0.82rem; line-height: 1.6;">
+                            <li><b>QKV & Softmax:</b> 거친 내적 점수를 100% 확률 비율로 변환해 문맥 가중합.</li>
+                            <li><b>KV Cache & HBM:</b> Decoding 재계산 방지 ➔ 동시 사용자 증가 시 HBM 용량/대역폭 폭발.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="info-card card-q" style="margin-top: 5px;">
+                    <div class="card-title">🎉 세미나를 마치며</div>
+                    <p style="font-size: 0.88rem;">
+                        경청해 주셔서 감사합니다! MHA 및 RoPE/Positional Encoding에 대한 세부 수학적 매커니즘은 **다음 차수 전용 세미나**에서 더욱 깊이 있게 탐구하겠습니다.
+                    </p>
+                </div>
+
+                <div class="speaker-note">
+                    📢 <b>세미나 종료:</b> 참석해 주셔서 감사합니다! 질의응답 시간을 갖도록 하겠습니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Controls Bottom Bar -->
+        <div class="nav-controls">
+            <button class="btn-nav" id="prevBtn" onclick="changeSlide(-1)">
+                <span>←</span> 이전 (Prev) <span class="key-badge">←</span>
+            </button>
+            
+            <button class="page-indicator-btn" onclick="toggleModal()" id="pageIndicator">
+                Slide 1 / 41
+            </button>
+            
+            <button class="btn-nav" id="nextBtn" onclick="changeSlide(1)">
+                다음 (Next) <span>→</span> <span class="key-badge">→</span>
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Quick Jump Index Modal -->
+    <div class="modal-overlay" id="indexModal" onclick="closeModalOnBg(event)">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">📋 슬라이드 목차 (Quick Index)</div>
+                <button class="icon-btn" onclick="toggleModal()">✕ 닫기</button>
+            </div>
+            <div class="slide-jump-list" id="jumpList">
+                <!-- Dynamically Generated -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        let showNotes = true;
+
+        // Initialize Index List
+        function initIndexModal() {
+            const jumpList = document.getElementById('jumpList');
+            jumpList.innerHTML = '';
+            slides.forEach((slide, index) => {
+                const titleText = slide.querySelector('.slide-title span').innerText;
+                const item = document.createElement('div');
+                item.className = `jump-item ${index === currentSlide ? 'active' : ''}`;
+                item.innerHTML = `
+                    <span>${titleText}</span>
+                    <span style="font-size:0.8rem; color:var(--text-sub);">Slide ${index + 1}</span>
+                `;
+                item.onclick = () => {
+                    goToSlide(index);
+                    toggleModal();
+                };
+                jumpList.appendChild(item);
+            });
+        }
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active');
+                if (i === index) {
+                    slide.classList.add('active');
+                }
+            });
+
+            // Update Progress Bar & Navigation
+            const progressPercent = ((index + 1) / totalSlides) * 100;
+            document.getElementById('progressBar').style.width = `${progressPercent}%`;
+            document.getElementById('pageIndicator').innerText = `Slide ${index + 1} / ${totalSlides}`;
+            document.getElementById('prevBtn').disabled = (index === 0);
+            document.getElementById('nextBtn').disabled = (index === totalSlides - 1);
+
+            // Re-render MathJax formula (오프라인 환경에서도 안전하게 예외 처리)
+            try {
+                if (window.MathJax && typeof MathJax.typesetPromise === 'function') {
+                    MathJax.typesetPromise().catch((err) => console.log('MathJax offline fallback mode active'));
+                }
+            } catch (e) {
+                // 오프라인 시 MathJax 미로드 예외 패스
+            }
+
+            initIndexModal();
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= totalSlides) currentSlide = totalSlides - 1;
+            showSlide(currentSlide);
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            showSlide(currentSlide);
+        }
+
+        function toggleModal() {
+            const modal = document.getElementById('indexModal');
+            modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+        }
+
+        function closeModalOnBg(e) {
+            if (e.target.classList.contains('modal-overlay')) {
+                toggleModal();
+            }
+        }
+
+        function toggleNotes() {
+            showNotes = !showNotes;
+            const notes = document.querySelectorAll('.speaker-note');
+            notes.forEach(note => {
+                note.style.display = showNotes ? 'flex' : 'none';
+            });
+        }
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert(`전체화면 전환 오류: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                changeSlide(1);
+            } else if (e.key === 'ArrowLeft') {
+                changeSlide(-1);
+            } else if (e.key === 'Escape') {
+                const modal = document.getElementById('indexModal');
+                if (modal.style.display === 'flex') toggleModal();
+            }
+        });
+
+        // Initialize first slide & index
+        showSlide(currentSlide);
+    </script>
+
+</body>
+
+</html>
