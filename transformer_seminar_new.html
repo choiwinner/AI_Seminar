@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 
 <head>
@@ -624,7 +624,7 @@
                     <span>1. 트랜스포머 & KV Cache H/W 개요</span>
                     <span class="slide-title-tag tag-concept">Overview</span>
                 </div>
-                <div class="slide-number">Slide 1 / 41</div>
+                <div class="slide-number">Slide 1 / 44</div>
             </div>
             <div class="slide-body">
                 <p>현대 대형 언어 모델(LLM)의 핵심 아키텍처인 <b>Transformer</b>의 본질은 모든 단어가 서로를 참조하여 맥락을 파악하는 <b>Self-Attention 메커니즘</b>에 있습니다.</p>
@@ -671,7 +671,7 @@
                     <span>2. 임베딩 (Embedding) - 단어를 의미 공간의 좌표로</span>
                     <span class="slide-title-tag tag-concept">Core Concept</span>
                 </div>
-                <div class="slide-number">Slide 2 / 41</div>
+                <div class="slide-number">Slide 2 / 44</div>
             </div>
             <div class="slide-body">
                 <p>컴퓨터는 'King', 'Queen', 'Man', 'Woman'이라는 글자 자체를 이해할 수 없으므로 다차원 공간상의 <b>수치 벡터(Vector)</b>로 변환합니다.</p>
@@ -709,7 +709,7 @@
                     <span>3. 임베딩 벡터 수치 예제 (\(d=4\) 특성 축)</span>
                     <span class="slide-title-tag tag-math">Math Example</span>
                 </div>
-                <div class="slide-number">Slide 3 / 41</div>
+                <div class="slide-number">Slide 3 / 44</div>
             </div>
             <div class="slide-body">
                 <p>4개의 특성(Feature) 축 <b>[남성성, 왕권, 여성성, 나이]</b>으로 각 단어를 4차원 벡터로 표현해 봅시다.</p>
@@ -756,7 +756,7 @@
                     <span>4. 동일한 두 벡터로 비교하는 Distance vs Similarity</span>
                     <span class="slide-title-tag tag-concept">Core Concept</span>
                 </div>
-                <div class="slide-number">Slide 4 / 41</div>
+                <div class="slide-number">Slide 4 / 44</div>
             </div>
             <div class="slide-body">
                 <p>동일한 <b>두 벡터 \(\vec{A}(1, 2)\)와 \(\vec{B}(4, 8)\)</b>를 모델링하여 3가지 지표의 극적인 차이점을 비교해 봅시다.</p>
@@ -794,7 +794,7 @@
                     <span>5. 유클리드 거리 (Euclidean Distance, \(L_2\))</span>
                     <span class="slide-title-tag tag-math">Distance Metric</span>
                 </div>
-                <div class="slide-number">Slide 5 / 41</div>
+                <div class="slide-number">Slide 5 / 44</div>
             </div>
             <div class="slide-body">
                 <p>피타고라스 정리에 기초하여 두 점 \(A(1,2)\)와 \(B(4,8)\) 사이의 <b>최단 대각선 직선 거리</b>를 구합니다.</p>
@@ -851,7 +851,7 @@
                     <span>6. 맨해튼 거리 (Manhattan Distance, \(L_1\))</span>
                     <span class="slide-title-tag tag-math">Distance Metric</span>
                 </div>
-                <div class="slide-number">Slide 6 / 41</div>
+                <div class="slide-number">Slide 6 / 44</div>
             </div>
             <div class="slide-body">
                 <p>동일한 두 점 \(A(1,2)\)와 \(B(4,8)\)에 대해 격자 도로망을 따라 <b>직각 이동 거리의 합</b>을 구합니다.</p>
@@ -904,7 +904,7 @@
                     <span>7. 코사인 유사도 (Cosine Similarity)</span>
                     <span class="slide-title-tag tag-math">Similarity Metric</span>
                 </div>
-                <div class="slide-number">Slide 7 / 41</div>
+                <div class="slide-number">Slide 7 / 44</div>
             </div>
             <div class="slide-body">
                 <p>동일한 두 벡터 \(\vec{A}(1,2)\)와 \(\vec{B}(4,8)\)에 대해 <b>화살표의 사이각(\(\theta\))</b>만을 측정해 봅시다.</p>
@@ -953,7 +953,7 @@
                     <span>8. 왜 트랜스포머는 Dot Product(내적)을 사용하는가?</span>
                     <span class="slide-title-tag tag-hw">H/W & Math Logic</span>
                 </div>
-                <div class="slide-number">Slide 8 / 41</div>
+                <div class="slide-number">Slide 8 / 44</div>
             </div>
             <div class="slide-body">
                 <p>코사인 유사도나 유클리드 거리 대신 <b>Dot Product (\(A \cdot B^T = \sum A_i B_i\))</b>를 선택한 2가지 강력한 이유가 있습니다.</p>
@@ -997,7 +997,7 @@
                     <span>9. 3차원에서 수천 차원(LLM \(d=4096\))으로의 확장성</span>
                     <span class="slide-title-tag tag-concept">Scalability</span>
                 </div>
-                <div class="slide-number">Slide 9 / 41</div>
+                <div class="slide-number">Slide 9 / 44</div>
             </div>
             <div class="slide-body">
                 <p>2차원에서 살펴본 내적과 코사인 유사도 개념은 <b>3차원(3D) 및 수천 차원 LLM 공간</b>으로도 완벽히 확장됩니다.</p>
@@ -1036,7 +1036,7 @@
                     <span>10. 닷 연산 (Dot Product) 실전 수치 계산 예제</span>
                     <span class="slide-title-tag tag-math">Math Example</span>
                 </div>
-                <div class="slide-number">Slide 10 / 41</div>
+                <div class="slide-number">Slide 10 / 44</div>
             </div>
             <div class="slide-body">
                 <p>실제 4차원 임베딩 벡터값으로 두 단어 간 <b>내적(Dot Product) 수치</b>를 직접 계산해 봅시다.</p>
@@ -1091,7 +1091,7 @@
                     <span>11. 전체 문장 "I LOVE YOU" & 가중치 행렬(\(4\times2\)) 원리</span>
                     <span class="slide-title-tag tag-concept">Setup & Projection</span>
                 </div>
-                <div class="slide-number">Slide 11 / 41</div>
+                <div class="slide-number">Slide 11 / 44</div>
             </div>
             <div class="slide-body">
                 <p>문장 <b>"I LOVE YOU"</b>의 3개 단어는 <b>단 하나의 동일한 가중치 행렬(\(W^Q, W^K, W^V\))</b>을 통과합니다.</p>
@@ -1136,7 +1136,7 @@
                     <span>12. 단어 'I'의 \(Q_I, K_I, V_I\) 투영 수치 계산</span>
                     <span class="slide-title-tag tag-math">Math Step</span>
                 </div>
-                <div class="slide-number">Slide 12 / 41</div>
+                <div class="slide-number">Slide 12 / 44</div>
             </div>
             <div class="slide-body">
                 <p>단어 <b>'I' (\([1, 0, 1, 0]\))</b>의 \(Q_I, K_I, V_I\) 변환 행렬 곱 풀이 과정입니다.</p>
@@ -1169,7 +1169,7 @@
                     <span>13. 단어 'I' 자기 자신과의 Self-Attention 연산</span>
                     <span class="slide-title-tag tag-concept">Self-Attention</span>
                 </div>
-                <div class="slide-number">Slide 13 / 41</div>
+                <div class="slide-number">Slide 13 / 44</div>
             </div>
             <div class="slide-body">
                 <p>단어 'I'의 질문(\(Q_I\))과 자신의 키(\(K_I\))를 곱해 자기 자신과의 관심도 점수를 구합니다.</p>
@@ -1211,7 +1211,7 @@
                     <span>14. 왜 어텐션 점수(Score) 뒤에 Value(V)를 또 곱하는가?</span>
                     <span class="slide-title-tag tag-concept">Core Concept</span>
                 </div>
-                <div class="slide-number">Slide 14 / 41</div>
+                <div class="slide-number">Slide 14 / 44</div>
             </div>
             <div class="slide-body">
                 <p>\(QK^T\)로 관심도 점수(Score)를 구했음에도 <b>Value(\(V\))를 곱해야 하는 결정적 이유</b>와 <b>크기의 비밀</b>입니다.</p>
@@ -1258,7 +1258,7 @@
                     <span>15. 단어 'LOVE'의 \(Q_L, K_L, V_L\) 투영 수치 계산</span>
                     <span class="slide-title-tag tag-math">Math Step</span>
                 </div>
-                <div class="slide-number">Slide 15 / 41</div>
+                <div class="slide-number">Slide 15 / 44</div>
             </div>
             <div class="slide-body">
                 <p>단어 <b>'LOVE' (\([0, 1, 0, 1]\))</b>의 \(Q_L, K_L, V_L\) 변환 행렬 곱 풀이 과정입니다.</p>
@@ -1287,7 +1287,7 @@
                     <span>16. 단어 'LOVE' 자기 자신과의 Self-Attention 연산</span>
                     <span class="slide-title-tag tag-concept">Self-Attention</span>
                 </div>
-                <div class="slide-number">Slide 16 / 41</div>
+                <div class="slide-number">Slide 16 / 44</div>
             </div>
             <div class="slide-body">
                 <p>단어 'LOVE'의 질문(\(Q_L\))과 자신의 키(\(K_L\))를 곱해 자기 자신과의 관심도 점수를 구합니다.</p>
@@ -1325,7 +1325,7 @@
                     <span>17. 단어 'YOU'의 \(Q_Y, K_Y, V_Y\) 투영 수치 계산</span>
                     <span class="slide-title-tag tag-math">Math Step</span>
                 </div>
-                <div class="slide-number">Slide 17 / 41</div>
+                <div class="slide-number">Slide 17 / 44</div>
             </div>
             <div class="slide-body">
                 <p>단어 <b>'YOU' (\([1, 1, 0, 0]\))</b>의 \(Q_Y, K_Y, V_Y\) 변환 행렬 곱 풀이 과정입니다.</p>
@@ -1354,7 +1354,7 @@
                     <span>18. 단어 'YOU' 자기 자신과의 Self-Attention 연산</span>
                     <span class="slide-title-tag tag-concept">Self-Attention</span>
                 </div>
-                <div class="slide-number">Slide 18 / 41</div>
+                <div class="slide-number">Slide 18 / 44</div>
             </div>
             <div class="slide-body">
                 <p>단어 'YOU'의 질문(\(Q_Y\))과 자신의 키(\(K_Y\))를 곱해 자기 자신과의 관심도 점수를 구합니다.</p>
@@ -1392,7 +1392,7 @@
                     <span>19. "I LOVE YOU" 어텐션 행렬 내적 (\(QK^T\))의 수치별 의미</span>
                     <span class="slide-title-tag tag-math">Matrix Attention</span>
                 </div>
-                <div class="slide-number">Slide 19 / 41</div>
+                <div class="slide-number">Slide 19 / 44</div>
             </div>
             <div class="slide-body">
                 <p>3개 단어의 어텐션 행렬 내적 결과인 <b>\(QK^T\) 성분 수치</b>가 왜 1이고 0이며 2인지를 살펴봅시다.</p>
@@ -1434,7 +1434,7 @@
                     <span>20. [종합 1/3] 혼자 있던 'I'가 문맥을 만나는 순간</span>
                     <span class="slide-title-tag tag-concept">QKV Synthesis</span>
                 </div>
-                <div class="slide-number">Slide 20 / 41</div>
+                <div class="slide-number">Slide 20 / 44</div>
             </div>
             <div class="slide-body">
                 <p>독립 단어 벡터였던 'I'가 어텐션 연산 \([1, 0, 1]\)을 통해 <b>문맥에 반응하는 단어로 변신하는 핵심 원리</b>입니다.</p>
@@ -1487,7 +1487,7 @@
                     <span>21. [종합 2/3] 점수판 \([1,0,1]\)에 Value(V)를 곱해 '진짜 문맥 정보' 완성하기</span>
                     <span class="slide-title-tag tag-math">QKV Synthesis</span>
                 </div>
-                <div class="slide-number">Slide 21 / 41</div>
+                <div class="slide-number">Slide 21 / 44</div>
             </div>
             <div class="slide-body">
                 <p>점수판 \([1,0,1]\)은 비율(지시서)일 뿐입니다. 여기에 <b>의미 실체인 Value(\(V\))를 곱해 가중합</b>을 완성합니다.</p>
@@ -1530,7 +1530,7 @@
                     <span>22. [종합 3/3] Self-Attention 4단계 핵심 프로세스 한눈에 보기</span>
                     <span class="slide-title-tag tag-concept">Master Map</span>
                 </div>
-                <div class="slide-number">Slide 22 / 41</div>
+                <div class="slide-number">Slide 22 / 44</div>
             </div>
             <div class="slide-body">
                 <p>단어 'I'가 문맥 벡터로 거듭나는 <b>Self-Attention 4단계 프로세스 총정리 맵</b>입니다.</p>
@@ -1576,7 +1576,7 @@
                     <span>23. 전체 문장 "I LOVE YOU" 한 번에 묶는 Q, K, V 행렬 통합 연산</span>
                     <span class="slide-title-tag tag-math">Full Matrix Attention</span>
                 </div>
-                <div class="slide-number">Slide 23 / 41</div>
+                <div class="slide-number">Slide 23 / 44</div>
             </div>
             <div class="slide-body">
                 <p>단어 1개씩이 아닌, <b>문장 전체 3개 단어의 Q, K, V 행렬 곱산(\(3 \times 2\))</b>을 일괄 수행합니다.</p>
@@ -1613,7 +1613,7 @@
                     <span>24. [Softmax 1/3] Softmax란 무엇인가? — 거친 수치를 합 1.0(100%) 확률로!</span>
                     <span class="slide-title-tag tag-math">Softmax Math</span>
                 </div>
-                <div class="slide-number">Slide 24 / 41</div>
+                <div class="slide-number">Slide 24 / 44</div>
             </div>
             <div class="slide-body">
                 <p>내적 점수 \(QK^T\) (\(1, 0, 2\) 등)는 거친 임의의 점수입니다. <b>Softmax</b>는 이를 <b>합이 1.0(100%)인 확률 비율</b>로 변환합니다.</p>
@@ -1656,7 +1656,7 @@
                     <span>25. [Softmax 2/3] 왜 하필 \(e^x\) (자연상수 e)를 쓸까? — 딥러닝 미분의 비밀</span>
                     <span class="slide-title-tag tag-math">Derivative Secret</span>
                 </div>
-                <div class="slide-number">Slide 25 / 41</div>
+                <div class="slide-number">Slide 25 / 44</div>
             </div>
             <div class="slide-body">
                 <p>지수함수 중 왜 일반 숫자(\(2^x, 10^x\)) 대신 <b>자연상수 \(e\) (\(e \approx 2.718\))</b>를 사용하는지의 수학적 이점입니다.</p>
@@ -1699,7 +1699,7 @@
                     <span>26. [Softmax 3/3] 그래서 왜 \(QK^T\) 내적 곱 뒤에 Softmax를 적용해야 하는가?</span>
                     <span class="slide-title-tag tag-concept">Pipeline Connection</span>
                 </div>
-                <div class="slide-number">Slide 26 / 41</div>
+                <div class="slide-number">Slide 26 / 44</div>
             </div>
             <div class="slide-body">
                 <p>거친 내적 점수판 \(QK^T\)에 <b>Softmax를 씌워 Value(\(V\))와 결합하는 완벽한 파이프라인</b>입니다.</p>
@@ -1745,7 +1745,7 @@
                     <span>27. Scaled Dot-Product Attention & 스케일링</span>
                     <span class="slide-title-tag tag-math">Math Concept</span>
                 </div>
-                <div class="slide-number">Slide 27 / 41</div>
+                <div class="slide-number">Slide 27 / 44</div>
             </div>
             <div class="slide-body">
                 <p>Attention 수식의 분모에 들어가는 <b>\(\sqrt{d_k}\) 스케일링</b>은 내적 연산의 수치 안정성을 위해 필수적입니다.</p>
@@ -1785,7 +1785,7 @@
                     <span>28. 단어 'I'의 Softmax 정규화 & 문맥 벡터 수치 연산</span>
                     <span class="slide-title-tag tag-concept">Word Step (I)</span>
                 </div>
-                <div class="slide-number">Slide 28 / 41</div>
+                <div class="slide-number">Slide 28 / 44</div>
             </div>
             <div class="slide-body">
                 <p>단어 'I'의 Query(\(Q_I\))가 전체 문장의 \(K, V\) 행렬과 연산하여 문맥을 흡수합니다.</p>
@@ -1816,7 +1816,7 @@
                     <span>29. 단어 'LOVE'의 Softmax 정규화 & 문맥 벡터 수치 연산</span>
                     <span class="slide-title-tag tag-concept">Word Step (LOVE)</span>
                 </div>
-                <div class="slide-number">Slide 29 / 41</div>
+                <div class="slide-number">Slide 29 / 44</div>
             </div>
             <div class="slide-body">
                 <p>단어 'LOVE'의 Query(\(Q_L=[0,1]\))가 전체 문장의 \(K, V\) 행렬과 연산하여 문맥을 흡수합니다.</p>
@@ -1847,7 +1847,7 @@
                     <span>30. 단어 'YOU'의 Softmax 정규화 & 문맥 벡터 수치 연산</span>
                     <span class="slide-title-tag tag-concept">Word Step (YOU)</span>
                 </div>
-                <div class="slide-number">Slide 30 / 41</div>
+                <div class="slide-number">Slide 30 / 44</div>
             </div>
             <div class="slide-body">
                 <p>단어 'YOU'의 Query(\(Q_Y=[1,1]\))가 전체 문장의 \(K, V\) 행렬과 연산하여 문맥을 흡수합니다.</p>
@@ -1878,7 +1878,7 @@
                     <span>31. Softmax 적용 전(Slide 23) vs 적용 후(Slide 28~30) 극적 비교</span>
                     <span class="slide-title-tag tag-math">Comparison</span>
                 </div>
-                <div class="slide-number">Slide 31 / 41</div>
+                <div class="slide-number">Slide 31 / 44</div>
             </div>
             <div class="slide-body">
                 <p>내적 스코어를 그대로 곱했을 때와 <b>Softmax 정규화를 거쳤을 때의 문맥 행렬 결과 비교</b>입니다.</p>
@@ -1913,84 +1913,226 @@
             </div>
         </div>
 
-        <!-- Slide 32 [NEW]: LLM 2 Execution Phases - Prefill vs Decoding Phase -->
+        <!-- Slide 32: [LLM Master Map] Prefill -> Decoding Master Pipeline Roadmap -->
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
-                    <span>32. LLM의 2가지 동작 단계 — Prefill vs Decoding Phase</span>
-                    <span class="slide-title-tag tag-hw">LLM Execution</span>
+                    <span>32. [LLM Master Map] 프롬프트 입력부터 첫 토큰 출력까지 — Prefill \(\rightarrow\) Decoding 전체 흐름도</span>
+                    <span class="slide-title-tag tag-concept">Master Pipeline</span>
                 </div>
-                <div class="slide-number">Slide 32 / 41</div>
             </div>
             <div class="slide-body">
-                <p>LLM 추론 실행은 동작 특성과 H/W 요구사항이 완전히 다른 <b>2가지 단계(Phase)</b>로 나뉩니다.</p>
+                <p>LLM 추론 서비스의 전체 일생: <b>프롬프트 전처리(Prefill)</b>부터 <b>단어 연속 생성(Decoding)</b>까지의 마스터 로드맵입니다.</p>
 
-                <div class="grid-2col">
+                <div class="grid-3col" style="gap:12px;">
                     <div class="info-card card-q">
-                        <div class="card-title">1️⃣ Prefill Phase (프롬프트 한 번에 연산)</div>
-                        <ul style="margin-left: 15px; font-size: 0.88rem; line-height: 1.7;">
-                            <li>사용자가 입력한 문장(프롬프트) 전체 토큰을 <b>한 번에 입력받아 행렬 곱(GEMM) 수행</b>.</li>
-                            <li>모든 토큰의 \(Q, K, V\)가 동시에 대규모로 생성됨.</li>
-                            <li><b>H/W 특성:</b> <span class="hl-q">Compute-Bound</span> (GPU/NPU 연산 코어가 100% 풀 가동!).</li>
-                        </ul>
-                    </div>
-
-                    <div class="info-card card-hw">
-                        <div class="card-title">2️⃣ Decoding Phase (토큰 1개씩 순차 생성)</div>
-                        <ul style="margin-left: 15px; font-size: 0.88rem; line-height: 1.7;">
-                            <li>다음 단어 토큰을 <b>1개씩 Autoregressive로 순차 생성</b> (Sequence Generation).</li>
-                            <li>새로 생성된 1개 토큰의 Query가 <b>이전 모든 토큰의 Key, Value를 참조</b>.</li>
-                            <li><b>H/W 특성:</b> <span class="hl-hw">Memory-Bandwidth Bound</span> (연산보다 메모리 로딩 속도가 지배!).</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="speaker-note">
-                    💡 <b>핵심 구분:</b> Prefill은 거대한 행렬 연산(Compute-Bound)이고, Decoding은 이전 토큰 데이터를 계속 읽어야 하는 메모리 병목(Memory-Bound) 단계입니다.
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 33 [NEW]: Why KV Cache is Essential? - Latency & Efficiency -->
-        <div class="slide">
-            <div class="slide-header">
-                <div class="slide-title">
-                    <span>33. 왜 KV Cache가 필연적으로 필요한가? — 속도와 연산 효율</span>
-                    <span class="slide-title-tag tag-hw">KV Cache Purpose</span>
-                </div>
-                <div class="slide-number">Slide 33 / 41</div>
-            </div>
-            <div class="slide-body">
-                <p>Decoding 단계에서 토큰 1개를 생성할 때 <b>KV Cache가 없을 때 발생하는 재계산의 비극</b>입니다.</p>
-
-                <div class="grid-2col">
-                    <div class="info-card card-hw">
-                        <div class="card-title">❌ KV Cache가 없을 때 (재계산의 비극)</div>
-                        <p style="font-size: 0.85rem; line-height: 1.6;">
-                            100번째 단어를 생성할 때, 앞선 <b>99개 단어의 Key와 Value를 처음부터 다시 재계산</b>해야 합니다!<br>
-                            ➔ 토큰이 길어질수록 계산량이 \(O(N^2)\)으로 폭발하여 <b>추론 속도(Latency)가 멸망</b>하고 연산 코어가 낭비됩니다.
+                        <div class="card-title">1️⃣ 유저 프롬프트 입력 (Prompt Input)</div>
+                        <p style="font-size: 0.82rem; line-height: 1.5;">
+                            • 입력: <span class="calc-result">"I LOVE YOU"</span> (3개 토큰)<br>
+                            • 토큰들을 한 번에 묶어 행렬 곱산 준비
                         </p>
                     </div>
 
                     <div class="info-card card-k">
-                        <div class="card-title">✅ KV Cache가 있을 때 (속도 & 효율 혁신)</div>
-                        <p style="font-size: 0.85rem; line-height: 1.6;">
-                            이전 99개 단어의 Key, Value를 <b>HBM 메모리에 저장(Cache)해 두고 재사용</b>합니다!<br>
-                            ➔ 새로 생성된 토큰 1개의 \(K, V\)만 캐시에 덧붙이므로(Row Append) <b>초당 생성 토큰 수(TPS)가 극대화</b>됩니다.
+                        <div class="card-title">2️⃣ Prefill Phase (한 번에 대규모 연산)</div>
+                        <p style="font-size: 0.82rem; line-height: 1.5;">
+                            • HBM 가중치로 3개 단어 동시 연산<br>
+                            • $K, V$ 3줄 HBM 쟁여두기<br>
+                            • 🌟 <b>1번째 생성 토큰 "VERY" 예측!</b>
+                        </p>
+                    </div>
+
+                    <div class="info-card card-v">
+                        <div class="card-title">3️⃣ Decoding Phase (토큰 1개씩 순차 생성)</div>
+                        <p style="font-size: 0.82rem; line-height: 1.5;">
+                            • "VERY"가 다음 입력으로 귀환<br>
+                            • HBM의 3줄 $K, V$ 읽어 어텐션<br>
+                            • $K_{\text{VERY}}, V_{\text{VERY}}$ 4번째 줄 Append!
                         </p>
                     </div>
                 </div>
 
-                <div class="formula-card" style="font-size: 1.1rem; padding: 14px;">
-                    🚀 KV Cache = 이전 토큰 K, V 재계산 100% 제거 ➔ 추론 속도(Latency) 극대화 + H/W 연산 효율 확보
-                </div>
-
                 <div class="human-note">
-                    💡 <b>문과적 직관 해석:</b> "100번째 단어를 쓸 때 1~99번째 단어의 키/값을 매번 처음부터 다시 계산하려면 반도체가 뻗어버립니다! 이 과거 이력을 초고속 HBM 메모리 보관함(KV Cache)에 딱 쟁여두고 새로 나온 100번째 토큰만 쏙 덧붙이면 속도가 미친 듯이 빨라집니다!"
+                    💡 <b>문과적 직관 해석:</b> "유저가 건넨 프롬프트 3글자를 한 입에 꿀꺽 삼키며 분석(Prefill)한 뒤, 첫 번째 대답 단어 'VERY'를 뱉어내고, 이제부터는 한 단어씩 말꼬리를 물며(Decoding) 대화를 이어나가는 전체 파이프라인입니다!"
                 </div>
 
                 <div class="speaker-note">
-                    💡 <b>도입 이유:</b> KV Cache는 단순한 메모리 기법이 아니라, LLM이 실시간 대화 서비스(ChatGPT 등)를 가능하게 만든 결정적 하드웨어 추론 혁신입니다.
+                    💡 <b>로드맵 안내:</b> 이제부터 HBM 메모리에 모델 가중치와 KV Cache가 어떻게 공존하며 상주하는지 하드웨어 내부를 탐구합니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 33: [HBM Architecture] Model Weights vs KV Cache in HBM -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>33. [HBM Architecture 1/2] HBM 메모리 거주자 2대장 — 고정 가중치(Model Weights) vs 동적 KV Cache</span>
+                    <span class="slide-title-tag tag-hw">HBM Memory Structure</span>
+                </div>
+            </div>
+            <div class="slide-body">
+                <p>GPU/NPU 부팅 시 HBM 초고속 메모리를 나누어 점유하는 <b>2가지 핵심 데이터 영역의 구분</b>입니다.</p>
+
+                <div class="grid-2col">
+                    <div class="info-card card-hw">
+                        <div class="card-title">🏰 1. LLM 모델 가중치 (Model Weights - 1등 영구 상주)</div>
+                        <ul style="margin-left: 15px; font-size: 0.83rem; line-height: 1.6;">
+                            <li>학습(Training)이 끝나 완전히 고정된 수치 행렬 ($W^Q, W^K, W^V$ 등).</li>
+                            <li>GPU 켜자마자 HBM에 1등으로 전개되어 <b>영구히 고정 상주</b>.</li>
+                            <li><b>점유 용량 예시:</b> LLaMA-70B FP16 기준 <span class="calc-result">~140 GB</span> 고정 점유.</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card card-q">
+                        <div class="card-title">📦 2. 동적 KV Cache 영역 (Dynamic KV Cache - 가변 폭발)</div>
+                        <ul style="margin-left: 15px; font-size: 0.83rem; line-height: 1.6;">
+                            <li>손님(유저)이 접속하여 프롬프트를 치고 대화가 생성될 때마다,</li>
+                            <li>HBM 텅 빈 창고 슬롯에 $K, V$가 1줄씩 <b>Row Append로 누적 확장</b>되는 가변 영역!</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="human-note">
+                    💡 <b>문과적 직관 해석:</b> "HBM 메모리는 '절대 움직이지 않는 굳건한 번역 공장 건물(모델 가중치)'과, '손님이 올 때마다 창고에 물건 상자가 계속 차곡차곡 쌓이는 가변 보관함(KV Cache)' 두 영역이 공존하는 곳입니다!"
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>핵심 정리:</b> 모델 가중치는 학습 후 HBM에 굳건히 고정되어 있으며, KV Cache는 사용자와의 대화 길이에 따라 HBM 빈 공간을 채워나갑니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 34: [LLM Generation 1/3] Where does Q_VERY come from? -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>34. [LLM Generation 1/3] 단어 'VERY'는 어디서 튀어 나왔나? — LLM 첫 단어 출력 메커니즘</span>
+                    <span class="slide-title-tag tag-concept">Q_VERY Origin</span>
+                </div>
+            </div>
+            <div class="slide-body">
+                <p>유저 프롬프트 "I LOVE YOU" 뒤에 붙는 신규 토큰 <b>'VERY'의 출처와 $Q_{\text{VERY}}$ 수치 산출 원리</b>입니다.</p>
+
+                <div class="grid-2col">
+                    <div class="info-card card-k">
+                        <div class="card-title">🎯 'VERY' 토큰의 출처: LLM의 예측 출력!</div>
+                        <p style="font-size: 0.83rem; line-height: 1.6;">
+                            • "I LOVE YOU" (Prefill 3개 토큰) 연산 후 Softmax 확률로부터,<br>
+                            • LLM 최상단 예측 헤드가 <b>"다음 단어로 'VERY'가 올 확률 92%!"</b>로 예측해낸 <b>LLM의 첫 번째 생성 토큰(1st Generated Token)</b>입니다!
+                        </p>
+                    </div>
+
+                    <div class="info-card card-v">
+                        <div class="card-title">📐 'VERY'의 질문 벡터 \(Q_{\text{VERY}}\) 수치 연산</div>
+                        <p style="font-size: 0.83rem; line-height: 1.6;">
+                            • 생성된 'VERY'의 임베딩 벡터: <span class="calc-result">\(X_{\text{VERY}} = [1, 0, 0, 1]\)</span><br>
+                            • HBM 상주 고정 가중치 \(W^Q\)를 곱해 질문 생성:<br>
+                            \(Q_{\text{VERY}} = [1, 0, 0, 1] \cdot \begin{bmatrix} 1&0 \\ 0&1 \\ 0&0 \\ 0&0 \end{bmatrix} = \mathbf{\textcolor{#38bdf8}{[1, 0]}}\)
+                        </p>
+                    </div>
+                </div>
+
+                <div class="human-note">
+                    💡 <b>문과적 직관 해석:</b> "'I LOVE YOU'는 사람이 써준 프롬프트이고, 'VERY'는 인공지능이 머리를 굴려 '다음에 나올 가장 잘 어울리는 단어'로 직접 뽑아낸 첫 번째 대답입니다! 이 대답 단어 'VERY'의 질문표가 바로 $Q_{\text{VERY}}=[1,0]$ 입니다."
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>출처 명확화:</b> Q_VERY는 유저 입력이 아니라 LLM이 Prefill 단계의 어텐션 결과로 예측해낸 첫 번째 출력 토큰으로부터 유래했습니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 35: [LLM Generation 2/3] K_VERY, V_VERY Math & HBM Row 4 Append -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>35. [LLM Generation 2/3] 단어 'VERY'의 분신 \(K_{\text{VERY}}, V_{\text{VERY}}\) 투영 및 HBM 4행 Append</span>
+                    <span class="slide-title-tag tag-math">Row Append Math</span>
+                </div>
+            </div>
+            <div class="slide-body">
+                <p>새로 태어난 'VERY' 토큰의 <b>$K, V$ 수치 계산과 HBM KV Cache 4번째 슬롯 입고 과정</b>입니다.</p>
+
+                <div class="grid-2col">
+                    <div class="info-card card-k">
+                        <div class="card-title">🔑 \(K_{\text{VERY}}\) 투영 수치 연산 (스케일링 전 원본)</div>
+                        <p style="font-size: 0.83rem;">
+                            \(K_{\text{VERY}} = X_{\text{VERY}} \cdot W^K = [1, 0, 0, 1] \cdot \begin{bmatrix} 1&0 \\ 0&1 \\ 0&0 \\ 0&0 \end{bmatrix} = \mathbf{\textcolor{#34d399}{[1, 0]}}\)
+                        </p>
+                    </div>
+
+                    <div class="info-card card-v">
+                        <div class="card-title">📦 \(V_{\text{VERY}}\) 투영 수치 연산 (Softmax 전 원본)</div>
+                        <p style="font-size: 0.83rem;">
+                            \(V_{\text{VERY}} = X_{\text{VERY}} \cdot W^V = [1, 0, 0, 1] \cdot \begin{bmatrix} 0&1 \\ 0&1 \\ 0&0 \\ 0&0 \end{bmatrix} = \mathbf{\textcolor{#c084fc}{[0, 1]}}\)
+                        </p>
+                    </div>
+                </div>
+
+                <!-- HBM 메모리 슬롯 시각화 카드 -->
+                <div class="prob-chart-box" style="border-color: rgba(52, 211, 153, 0.4);">
+                    <div style="font-size:0.88rem; font-weight:700; margin-bottom:6px; color:var(--k-color);">
+                        📦 Row Append 후 HBM KV Cache 보관함 (총 4행 수치 현황):
+                    </div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; font-size:0.8rem;">
+                        <div class="info-card card-k" style="padding:8px; margin:0;">
+                            <b>🔑 Key Cache ($4 \times 2$):</b><br>
+                            Row 1 ('I'): [1,0] | Row 2 ('LOVE'): [0,1]<br>
+                            Row 3 ('YOU'): [1,1] | <span class="calc-result">Row 4 ('VERY'): [1,0] (New!)</span>
+                        </div>
+                        <div class="info-card card-v" style="padding:8px; margin:0;">
+                            <b>📦 Value Cache ($4 \times 2$):</b><br>
+                            Row 1 ('I'): [0,1] | Row 2 ('LOVE'): [0,1]<br>
+                            Row 3 ('YOU'): [0,0] | <span class="calc-result">Row 4 ('VERY'): [0,1] (New!)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="human-note">
+                    💡 <b>문과적 직관 해석:</b> "새로 태어난 'VERY'의 열쇠([1,0])와 실체 재료([0,1]) 원본 2개를 HBM 보관함 4번째 칸에 새로 착 덧붙여서(Row Append) 이제 4개 단어 보관함이 완성됩니다!"
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>핵심:</b> K_VERY와 V_VERY는 스케일링/Softmax 전 원본 수치 그대로 HBM 캐시의 4번째 행에 덧붙여집니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 36: [LLM Generation 3/3] Q_VERY Attention Read Operation -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>36. [LLM Generation 3/3] \(Q_{\text{VERY}}\)가 HBM 4줄 \(K, V\)를 읽어오는 어텐션 연산</span>
+                    <span class="slide-title-tag tag-math">Decoding Attention</span>
+                </div>
+            </div>
+            <div class="slide-body">
+                <p>$Q_{\text{VERY}} ([1,0])$가 HBM에서 로드된 이전 $K_{\text{Cache}}, V_{\text{Cache}}$ 4줄과 어텐션하여 <b>5번째 단어 "MUCH"를 생성하는 수치 연산</b>입니다.</p>
+
+                <div class="grid-2col">
+                    <div class="info-card card-q">
+                        <div class="card-title">1️⃣ 내적 스코어 연산 (\(Q_{\text{VERY}} \cdot K_{\text{Cache}}^T\))</div>
+                        <p style="font-size: 0.83rem;">
+                            \([1, 0] \cdot \begin{bmatrix} 1 & 0 \\ 0 & 1 \\ 1 & 1 \\ 1 & 0 \end{bmatrix}^T = \mathbf{[1, \; 0, \; 1, \; 1]}\)<br>
+                            ➔ 'I'(1점), 'LOVE'(0점), 'YOU'(1점), 'VERY'(1점)
+                        </p>
+                    </div>
+
+                    <div class="info-card card-v">
+                        <div class="card-title">2️⃣ Value 가중합 및 5번째 단어 산출</div>
+                        <p style="font-size: 0.83rem;">
+                            Softmax 비율 정규화 후 $V_{\text{Cache}}$와 결합 $\rightarrow$ Output $[0, 1]$ 생성!<br>
+                            ➔ 🌟 <b>5번째 단어 "MUCH" 생성 결정!</b>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="human-note">
+                    💡 <b>문과적 직관 해석:</b> "'VERY'의 질문이 HBM에서 쟁여둔 4개 단어 친구들의 열쇠를 대보고, 가중합을 계산하여 '다음 단어로 MUCH를 말하자!'라고 결론을 내립니다!"
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>연속 생성:</b> 이렇게 4번째 단어 VERY가 5번째 단어 MUCH를 낳고, MUCH가 다시 6번째 단어를 낳는 수순으로 Decoding이 전개됩니다.
                 </div>
             </div>
         </div>
@@ -1999,10 +2141,10 @@
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
-                    <span>34. LLM '학습(Training)' vs '서비스/추론(Serving)' 메모리 구조 비교</span>
+                    <span>37. LLM '학습(Training)' vs '서비스/추론(Serving)' 메모리 구조 비교</span>
                     <span class="slide-title-tag tag-hw">Memory Economics</span>
                 </div>
-                <div class="slide-number">Slide 34 / 41</div>
+                <div class="slide-number">Slide 34 / 44</div>
             </div>
             <div class="slide-body">
                 <p>LLM 개발 단계별로 HBM 메모리를 점유하는 <b>핵심 요소와 메모리 구조의 결정적 차이점</b>입니다.</p>
@@ -2038,10 +2180,10 @@
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
-                    <span>35. 사용자가 늘수록 KV Cache 폭발 — "학습이 끝나도 HBM이 거대하게 필요한 이유!"</span>
+                    <span>38. 사용자가 늘수록 KV Cache 폭발 — "학습이 끝나도 HBM이 거대하게 필요한 이유!"</span>
                     <span class="slide-title-tag tag-hw">HBM Scaling</span>
                 </div>
-                <div class="slide-number">Slide 35 / 41</div>
+                <div class="slide-number">Slide 35 / 44</div>
             </div>
             <div class="slide-body">
                 <p>모델 학습이 완료되어 가중치 크기가 고정되어도 <b>서비스 사용자가 증가할 때 발생하는 HBM 폭발 현상</b>입니다.</p>
@@ -2074,10 +2216,10 @@
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
-                    <span>36. H/W 병목의 핵심: HBM 용량(Capacity) vs HBM 대역폭(Bandwidth)</span>
+                    <span>39. H/W 병목의 핵심: HBM 용량(Capacity) vs HBM 대역폭(Bandwidth)</span>
                     <span class="slide-title-tag tag-hw">HBM Dual Limits</span>
                 </div>
-                <div class="slide-number">Slide 36 / 41</div>
+                <div class="slide-number">Slide 36 / 44</div>
             </div>
             <div class="slide-body">
                 <p>LLM 추론 서비스 시 HBM 메모리가 요구받는 <b>두 가지 상이한 물리적 한계</b>입니다.</p>
@@ -2114,10 +2256,10 @@
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
-                    <span>37. [H/W 요약] Roofline 모델 & LLM Serving H/W 엔지니어링 3대 지침</span>
+                    <span>40. [H/W 요약] Roofline 모델 & LLM Serving H/W 엔지니어링 3대 지침</span>
                     <span class="slide-title-tag tag-hw">H/W Optimization</span>
                 </div>
-                <div class="slide-number">Slide 37 / 41</div>
+                <div class="slide-number">Slide 37 / 44</div>
             </div>
             <div class="slide-body">
                 <p>Decoding의 메모리 병목을 극복하기 위한 <b>현대 LLM H/W 최적화 핵심 기술 3가지</b>입니다.</p>
@@ -2162,10 +2304,10 @@
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
-                    <span>38. [추후 세미나 1] Multi-Head Attention — 왜 1개 Head로는 부족한가?</span>
+                    <span>41. [추후 세미나 1] Multi-Head Attention — 왜 1개 Head로는 부족한가?</span>
                     <span class="slide-title-tag tag-concept">Future Topic MHA</span>
                 </div>
-                <div class="slide-number">Slide 38 / 41</div>
+                <div class="slide-number">Slide 38 / 44</div>
             </div>
             <div class="slide-body">
                 <p>본 세미나에서는 1개 Head로 다루었지만, 실제 트랜스포머는 <b>여러 개의 Head(Multi-Head)</b>를 사용합니다.</p>
@@ -2196,10 +2338,10 @@
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
-                    <span>39. Multi-Head Attention의 다채로운 문맥 탐색 & 병렬 가속 원리</span>
+                    <span>42. Multi-Head Attention의 다채로운 문맥 탐색 & 병렬 가속 원리</span>
                     <span class="slide-title-tag tag-concept">MHA Concept</span>
                 </div>
-                <div class="slide-number">Slide 39 / 41</div>
+                <div class="slide-number">Slide 39 / 44</div>
             </div>
             <div class="slide-body">
                 <p>여러 Head가 독립적으로 추출한 관점들을 하나로 <b>합체(Concat)하고 가중치($W^O$)를 곱해 연산하는 원리</b>입니다.</p>
@@ -2242,10 +2384,10 @@
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
-                    <span>40. [추후 세미나 2] Positional Encoding — 어텐션 행렬 곱의 치명적 약점</span>
+                    <span>43. [추후 세미나 2] Positional Encoding — 어텐션 행렬 곱의 치명적 약점</span>
                     <span class="slide-title-tag tag-concept">Future Topic Positional</span>
                 </div>
-                <div class="slide-number">Slide 40 / 41</div>
+                <div class="slide-number">Slide 40 / 44</div>
             </div>
             <div class="slide-body">
                 <p>트랜스포머의 행렬 곱 어텐션 연산에는 <b>단어의 순서를 모르는 치명적인 약점</b>이 존재합니다.</p>
@@ -2280,10 +2422,10 @@
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
-                    <span>41. 위치 정보 주입(Sin/Cos 파동)과 세미나 최종 총정리</span>
+                    <span>44. 위치 정보 주입(Sin/Cos 파동)과 세미나 최종 총정리</span>
                     <span class="slide-title-tag tag-concept">Final Summary</span>
                 </div>
-                <div class="slide-number">Slide 41 / 41</div>
+                <div class="slide-number">Slide 41 / 44</div>
             </div>
             <div class="slide-body">
                 <div class="grid-2col">
@@ -2326,7 +2468,7 @@
             </button>
             
             <button class="page-indicator-btn" onclick="toggleModal()" id="pageIndicator">
-                Slide 1 / 41
+                Slide 1 / 44
             </button>
             
             <button class="btn-nav" id="nextBtn" onclick="changeSlide(1)">

@@ -48,26 +48,35 @@ c:\python\AI_Seminar\ (프로젝트 루트 디렉토리)
 
 ---
 
-## 📚 세미나 전체 내용 요약 (Total 41 Slides)
+## 📚 세미나 전체 내용 요약 (Total 44 Slides)
 
 본 세미나는 문과적 직관 비유와 구체적인 수치 연산을 결합하여 LLM의 핵심 동작과 H/W 병목 원리를 설명합니다.
 
-1. **단어 임베딩 (Embedding)**
+1. **단어 임베딩 (Embedding) (Slide 1~3)**
    - 단어를 다차원 공간의 수치 벡터로 변환 ($d_{model}$)
-   - `King - Man + Woman = Queen` 벡터 연산의 원리와 수치적 직관
-2. **거리(Distance) vs 유사도(Similarity)**
-   - 유클리드 거리 ($L_2$), 맨해튼 거리 ($L_1$), 코사인 유사도 ($\cos\theta$) 비교
+   - `King - Man + Woman = Queen` $[0.1, 0.9, 0.9, 0.7]$ 벡터 덧셈/뺄셈 연산의 수치적 직관
+2. **거리(Distance) vs 유사도(Similarity) (Slide 4~10)**
+   - 유클리드 거리 ($L_2$), 맨해튼 거리 ($L_1$), 코사인 유사도 ($\cos\theta$) 수치 풀이 비교
    - 왜 트랜스포머는 **Dot Product (내적)**을 사용하는가? (수학적 시그널 강도 + H/W GEMM/MAC 100% 가속)
-3. **Q, K, V 분신 투영 & Self-Attention 수치 연산**
+3. **Q, K, V 분신 투영 & Self-Attention 수치 연산 (Slide 11~23)**
    - 문장 *"I LOVE YOU"*의 구체적 $4 \times 2$ 가중치 투영 과정
    - **Query (질문)**, **Key (열쇠)**, **Value (실물 재료)** 역할 및 4단계 어텐션 파이프라인
-4. **Softmax & 딥러닝 미분의 비밀**
+   - 전체 문장 $QK^T \cdot V$ 통합 행렬 연산
+4. **Softmax & 딥러닝 미분의 비밀 (Slide 24~26)**
    - 거친 점수를 합이 1.0(100%)인 확률 비율로 변환하는 정규화
    - 왜 하필 자연상수 $e^x$를 쓰는가? (미분해도 자기 자신 $\rightarrow$ NPU/GPU 역전파 역량 가속)
-5. **Prefill vs Decoding Phase & KV Cache H/W 혁신**
-   - **Prefill (Compute-Bound)**: 입력 프롬프트 대규모 GEMM 연산
-   - **Decoding (Memory-Bound)**: 토큰 1개씩 생성시 $O(N^2)$ 재계산 비극 방지를 위한 **KV Cache** 도입
-6. **HBM 메모리 경제학 & 반도체 최적화**
+5. **$\sqrt{d_k}$ 스케일링 & 단어별 맥락 벡터 연산 (Slide 27~31)**
+   - 스케일링 미적용 시 내적 분산 폭발로 인한 One-Hot 쏠림(99.999%) 및 기울기 소멸 방지.
+   - 단어 'I', 'LOVE', 'YOU' 단어별 맥락 벡터 ($[0.16, 0.42]$ 등) 및 Softmax 적용 전/후 1:1 비교.
+6. **LLM 추론 로드맵 & HBM 상주 메모리 구조 (Slide 32~33)**
+   - **LLM Master Map (Slide 32)**: 프롬프트 입력 $\rightarrow$ Prefill Phase $\rightarrow$ Decoding Phase 전체 파이프라인 로드맵.
+   - **HBM 거주자 2대장 (Slide 33)**: **고정 상주 모델 가중치 (Model Weights ~140GB)** vs **동적 누적 KV Cache** 공존 구조.
+7. **Decoding 단계 & $Q_{\text{VERY}}$ 1:1 수치 풀이 (Slide 34~36)**
+   - **$Q_{\text{VERY}}$ 출처 (Slide 34)**: "I LOVE YOU" 어텐션 결과 LLM이 스스로 예측해낸 **1번째 생성 토큰 "VERY"** 및 임베딩 $X_{\text{VERY}}=[1,0,0,1]$ 질문 투영 수치 연산 ($Q_{\text{VERY}} = [1,0]$).
+   - **Row 4 Append (Slide 35)**: $K_{\text{VERY}}([1,0]), V_{\text{VERY}}([0,1])$ 투영 수치 및 HBM 4번째 줄 Append 시각화.
+   - **Decoding 어텐션 (Slide 36)**: $Q_{\text{VERY}}$가 HBM 4줄 $K, V$를 읽어 5번째 단어 "MUCH"를 생성하는 수치 연산.
+8. **HBM 메모리 경제학 & 반도체 최적화 (Slide 37~44)**
    - 학습(Training) vs 추론(Serving) 메모리 점유 구조 차이
-   - HBM 용량(Capacity) vs HBM 대역폭(Bandwidth) 병목
-   - **FlashAttention**, **PagedAttention**, **KV Cache Quantization (INT8/INT4)** 최신 H/W 최적화 3대장
+   - HBM 용량(Capacity) vs HBM 대역폭(Bandwidth) 2대 한계
+   - **Roofline 모델** 및 modern LLM H/W 엔지니어링 3대 지침 (FlashAttention, PagedAttention, Quantization)
+   - Multi-Head Attention & Positional Encoding 추후 세미나 과제 전개
