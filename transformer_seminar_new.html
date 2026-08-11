@@ -304,7 +304,7 @@
             border-radius: 10px;
             padding: 14px;
             text-align: center;
-            font-size: 1.05rem;
+            font-size: 1.1rem;
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
             overflow-x: auto;
         }
@@ -324,25 +324,6 @@
         .hl-v { color: var(--v-color); font-weight: 700; }
         .hl-score { color: var(--score-color); font-weight: 700; }
         .hl-hw { color: var(--hw-color); font-weight: 700; }
-
-        /* Calculation Result & Intuitive Human Note Highlights */
-        .calc-result {
-            color: #fbbf24;
-            font-weight: 800;
-            text-shadow: 0 0 8px rgba(251, 191, 36, 0.3);
-            padding: 0 3px;
-        }
-
-        .human-note {
-            margin: 4px 0 6px 0;
-            padding: 6px 12px;
-            background: rgba(251, 191, 36, 0.08);
-            border-left: 3px solid #fbbf24;
-            border-radius: 0 8px 8px 0;
-            font-size: 0.82rem;
-            color: #fef08a;
-            line-height: 1.5;
-        }
 
         /* Diagrams & Flows */
         .pipeline-flow {
@@ -399,6 +380,39 @@
             justify-content: center;
             align-items: center;
             box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Tables */
+        table.custom-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 10px 0;
+        }
+
+        table.custom-table th, table.custom-table td {
+            padding: 10px 14px;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        table.custom-table th {
+            background: rgba(30, 41, 59, 0.9);
+            color: var(--q-color);
+            font-weight: 700;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        table.custom-table td {
+            background: rgba(15, 23, 42, 0.5);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        table.custom-table tr:last-child td {
+            border-bottom: none;
         }
 
         /* Speaker Note Footer */
@@ -552,6 +566,25 @@
             font-size: 0.75rem;
             font-family: monospace;
         }
+
+        /* 계산 결과 하이라이트 (황금색 Bold) */
+        .calc-result {
+            color: #fbbf24;
+            font-weight: 800;
+            text-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
+        }
+
+        /* 문과적 직관 해석 박스 */
+        .human-note {
+            background: rgba(251, 191, 36, 0.08);
+            border-left: 4px solid #fbbf24;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 0.88rem;
+            color: #fde68a;
+            margin: 6px 0;
+            line-height: 1.6;
+        }
     </style>
 </head>
 
@@ -644,7 +677,7 @@
                 <p>컴퓨터는 'King', 'Queen', 'Man', 'Woman'이라는 글자 자체를 이해할 수 없으므로 다차원 공간상의 <b>수치 벡터(Vector)</b>로 변환합니다.</p>
                 
                 <div class="formula-card">
-                    $$\text{Vector}(\text{King}) - \text{Vector}(\text{Man}) + \text{Vector}(\text{Woman}) \approx \text{Vector}(\text{Queen})$$
+                    👑 Vector("King") − 👨 Vector("Man") + 👩 Vector("Woman") ≈ 👸 Vector("Queen")
                 </div>
 
                 <div class="grid-2col">
@@ -673,7 +706,7 @@
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
-                    <span>3. 임베딩 벡터 수치 예제 ($d=4$ 특성 축)</span>
+                    <span>3. 임베딩 벡터 수치 예제 (\(d=4\) 특성 축)</span>
                     <span class="slide-title-tag tag-math">Math Example</span>
                 </div>
                 <div class="slide-number">Slide 3 / 41</div>
@@ -685,35 +718,33 @@
                     <div class="info-card card-q">
                         <div class="card-title">📊 4차원 단어 임베딩 벡터 정의</div>
                         <ul style="margin-left: 15px; font-size: 0.9rem; line-height: 1.8;">
-                            <li>$\text{King} = [\mathbf{0.9}, \mathbf{0.9}, 0.1, 0.7]$ (남성성 high, 왕권 high)</li>
-                            <li>$\text{Man} = [\mathbf{0.9}, 0.0, 0.1, 0.6]$ (남성성 high, 왕권 zero)</li>
-                            <li>$\text{Woman} = [0.1, 0.0, \mathbf{0.9}, 0.6]$ (여성성 high, 왕권 zero)</li>
-                            <li>$\text{Queen} = [0.1, \mathbf{0.9}, \mathbf{0.9}, 0.7]$ (여성성 high, 왕권 high)</li>
+                            <li>\(\text{King} = [\mathbf{0.9}, \, \mathbf{0.9}, \, 0.1, \, 0.7]\) (남성성 high, 왕권 high)</li>
+                            <li>\(\text{Man} = [\mathbf{0.9}, \, 0.0, \, 0.1, \, 0.6]\) (남성성 high, 왕권 zero)</li>
+                            <li>\(\text{Woman} = [0.1, \, 0.0, \, \mathbf{0.9}, \, 0.6]\) (여성성 high, 왕권 zero)</li>
+                            <li>\(\text{Queen} = [0.1, \, \mathbf{0.9}, \, \mathbf{0.9}, \, 0.7]\) (여성성 high, 왕권 high)</li>
                         </ul>
                     </div>
 
                     <div class="info-card card-v">
                         <div class="card-title">🧮 실제 벡터 덧셈/뺄셈 연산 과정</div>
-                        <div class="math-box" style="font-size: 0.9rem; text-align: left; line-height: 1.8;">
-                            $$\begin{aligned}
-                            \text{King} &\quad [0.9, 0.9, 0.1, 0.7] \\
-                            -\text{Man} &\quad [0.9, 0.0, 0.1, 0.6] \\
-                            +\text{Woman} &\quad [0.1, 0.0, 0.9, 0.6] \\
-                            \hline
-                            = \mathbf{\textcolor{#fbbf24}{[0.1, 0.9, 0.9, 0.7]}} &\rightarrow \mathbf{Queen} \text{ Vector } (100\% \text{ Match})
-                            \end{aligned}$$
+                        <div class="math-box" style="font-size: 0.85rem; text-align: left; line-height: 1.8;">
+                            &nbsp;&nbsp;\(\text{King} \quad [0.9, \, 0.9, \, 0.1, \, 0.7]\)<br>
+                            \(-\text{Man} \quad [0.9, \, 0.0, \, 0.1, \, 0.6]\)<br>
+                            \(+\text{Woman} \, [0.1, \, 0.0, \, 0.9, \, 0.6]\)<br>
+                            ------------------------------------<br>
+                             \(=\mathbf{\textcolor{#fbbf24}{[0.1, \, 0.9, \, 0.9, \, 0.7]}} \rightarrow \mathbf{Queen} \text{ 벡터와 } \mathbf{100\%} \text{ 일치!}\)
                         </div>
                     </div>
                 </div>
+
+                <p style="font-size: 0.95rem;">이처럼 다차원 공간상에서 단어의 특성(Feature)이 수치화되어 있어, 컴퓨터는 <b>벡터 연산만으로 인간의 언어 논리와 관계를 계산</b>하게 됩니다.</p>
 
                 <div class="human-note">
                     💡 <b>문과적 직관 해석:</b> "'왕(King)'에서 '남성성(Man)'을 빼고 '여성성(Woman)'을 얹었더니, 소름 돋게도 '여왕(Queen)'의 수치 벡터 <span class="calc-result">[0.1, 0.9, 0.9, 0.7]</span>와 100% 완벽 일치합니다!"
                 </div>
 
-                <p style="font-size: 0.95rem;">이처럼 다차원 공간상에서 단어의 특성(Feature)이 수치화되어 있어, 컴퓨터는 <b>벡터 연산만으로 인간의 언어 논리와 관계를 계산</b>하게 됩니다.</p>
-
                 <div class="speaker-note">
-                    💡 <b>특성 차원(Dimension):</b> 실제 LLM(LLaMA 등)에서는 4차원이 아닌 $d_{model} = 4096 \sim 8192$ 이상의 거대한 다차원 공간을 사용합니다.
+                    💡 <b>특성 차원(Dimension):</b> 실제 LLM(LLaMA 등)에서는 4차원이 아닌 \(d_{model} = 4096\)~\(8192\) 이상의 거대한 다차원 공간을 사용합니다.
                 </div>
             </div>
         </div>
@@ -728,24 +759,24 @@
                 <div class="slide-number">Slide 4 / 41</div>
             </div>
             <div class="slide-body">
-                <p>동일한 <b>두 벡터 $\vec{A}(1, 2)$와 $\vec{B}(4, 8)$</b>를 모델링하여 3가지 지표의 극적인 차이점을 비교해 봅시다.</p>
+                <p>동일한 <b>두 벡터 \(\vec{A}(1, 2)\)와 \(\vec{B}(4, 8)\)</b>를 모델링하여 3가지 지표의 극적인 차이점을 비교해 봅시다.</p>
 
                 <div class="grid-2col">
                     <div class="info-card card-q">
                         <div class="card-title">📝 두 문장의 의미 예시</div>
                         <ul style="margin-left: 15px; font-size: 0.9rem;">
-                            <li><b>벡터 $\vec{A}(1, 2)$:</b> 짧은 문장 (예: <i>"사과가 맛있다"</i>)</li>
-                            <li><b>벡터 $\vec{B}(4, 8)$:</b> 길지만 의미가 같은 문장 (예: <i>"사과가 정말 매우 엄청나게 맛있다"</i>)</li>
-                            <li>$\vec{B} = 4 \times \vec{A}$ (방향은 같고 크기만 4배)</li>
+                            <li><b>벡터 \(\vec{A}(1, 2)\):</b> 짧은 문장 (예: <i>"사과가 맛있다"</i>)</li>
+                            <li><b>벡터 \(\vec{B}(4, 8)\):</b> 길지만 의미가 같은 문장 (예: <i>"사과가 정말 매우 엄청나게 맛있다"</i>)</li>
+                            <li>\(\vec{B} = 4 \times \vec{A}\) (방향은 같고 크기만 4배)</li>
                         </ul>
                     </div>
 
                     <div class="info-card card-score">
                         <div class="card-title">🔍 3대 지표 미리보기 요약</div>
                         <ul style="margin-left: 15px; font-size: 0.9rem;">
-                            <li><b>코사인 유사도:</b> <span class="hl-q">$\cos \theta = 1.00$ (완벽 동일 의미!)</span></li>
-                            <li><b>유클리드 거리:</b> <span class="hl-hw">$d = 6.71$ (물리적 거리가 멂)</span></li>
-                            <li><b>맨해튼 거리:</b> <span class="hl-hw">$d = 9.00$ (물리적 거리가 매우 멂)</span></li>
+                            <li><b>코사인 유사도:</b> <span class="hl-q">\(\cos\theta = 1.00\) (완벽 동일 의미!)</span></li>
+                            <li><b>유클리드 거리:</b> <span class="hl-hw">\(d = 6.71\) (물리적 거리가 멂)</span></li>
+                            <li><b>맨해튼 거리:</b> <span class="hl-hw">\(d = 9.00\) (물리적 거리가 매우 멂)</span></li>
                         </ul>
                     </div>
                 </div>
@@ -760,13 +791,13 @@
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
-                    <span>5. 유클리드 거리 (Euclidean Distance, $L_2$)</span>
+                    <span>5. 유클리드 거리 (Euclidean Distance, \(L_2\))</span>
                     <span class="slide-title-tag tag-math">Distance Metric</span>
                 </div>
                 <div class="slide-number">Slide 5 / 41</div>
             </div>
             <div class="slide-body">
-                <p>피타고라스 정리에 기초하여 두 점 $A(1,2)$와 $B(4,8)$ 사이의 <b>최단 대각선 직선 거리</b>를 구합니다.</p>
+                <p>피타고라스 정리에 기초하여 두 점 \(A(1,2)\)와 \(B(4,8)\) 사이의 <b>최단 대각선 직선 거리</b>를 구합니다.</p>
 
                 <div class="grid-2col">
                     <div class="svg-graph-box">
@@ -796,12 +827,13 @@
                     </div>
 
                     <div class="info-card card-k">
-                        <div class="card-title">🧮 유클리드 거리 계산 ($A(1,2), B(4,8)$)</div>
+                        <div class="card-title">🧮 유클리드 거리 계산 (\(A(1,2), B(4,8)\))</div>
                         <div class="math-box" style="font-size: 0.95rem; text-align: left;">
-                            $$d(A, B) = \sqrt{(4-1)^2 + (8-2)^2} = \sqrt{3^2 + 6^2} = \sqrt{45} \approx {\color{#fbbf24} \mathbf{6.71}}$$
+                            $$d(A, B) = \sqrt{(4-1)^2 + (8-2)^2}$$
+                            \(d = \sqrt{3^2 + 6^2} = \sqrt{9 + 36} = \sqrt{45} \approx \mathbf{6.71}\)
                         </div>
                         <p style="font-size: 0.85rem; margin-top: 8px;">
-                            ⚠️ <b>거리의 문제점:</b> 두 문장의 의미가 완벽히 같음에도 불구하고, 수치 거리가 <span class="calc-result">6.71</span>로 크게 계산되어 "서로 다른 문장"으로 착각하게 됩니다.
+                            ⚠️ <b>거리의 문제점:</b> 두 문장의 의미가 완벽히 같음에도 불구하고, 수치 거리가 <b>6.71</b>로 크게 계산되어 "서로 다른 문장"으로 착각하게 됩니다.
                         </p>
                     </div>
                 </div>
@@ -816,13 +848,13 @@
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
-                    <span>6. 맨해튼 거리 (Manhattan Distance, $L_1$)</span>
+                    <span>6. 맨해튼 거리 (Manhattan Distance, \(L_1\))</span>
                     <span class="slide-title-tag tag-math">Distance Metric</span>
                 </div>
                 <div class="slide-number">Slide 6 / 41</div>
             </div>
             <div class="slide-body">
-                <p>동일한 두 점 $A(1,2)$와 $B(4,8)$에 대해 격자 도로망을 따라 <b>직각 이동 거리의 합</b>을 구합니다.</p>
+                <p>동일한 두 점 \(A(1,2)\)와 \(B(4,8)\)에 대해 격자 도로망을 따라 <b>직각 이동 거리의 합</b>을 구합니다.</p>
 
                 <div class="grid-2col">
                     <div class="svg-graph-box">
@@ -848,12 +880,13 @@
                     </div>
 
                     <div class="info-card card-hw">
-                        <div class="card-title">🧮 맨해튼 거리 계산 ($A(1,2), B(4,8)$)</div>
+                        <div class="card-title">🧮 맨해튼 거리 계산 (\(A(1,2), B(4,8)\))</div>
                         <div class="math-box" style="font-size: 0.95rem; text-align: left;">
-                            $$d(A, B) = |4 - 1| + |8 - 2| = 3 + 6 = {\color{#fbbf24} \mathbf{9.00}}$$
+                            $$d(A, B) = |4 - 1| + |8 - 2|$$
+                            \(d = 3 + 6 = \mathbf{9.00}\)
                         </div>
                         <p style="font-size: 0.85rem; margin-top: 8px;">
-                            ⚠️ <b>한계점:</b> 거리 기반 지표 중에서 가장 긴 <span class="calc-result">9.00</span>의 물리적 거리가 산출되어, 자연어 의미 측정용으로는 부적합함을 증명합니다.
+                            ⚠️ <b>한계점:</b> 거리 기반 지표 중에서 가장 긴 <b>9.00</b>의 물리적 거리가 산출되어, 자연어 의미 측정용으로는 부적합함을 증명합니다.
                         </p>
                     </div>
                 </div>
@@ -874,7 +907,7 @@
                 <div class="slide-number">Slide 7 / 41</div>
             </div>
             <div class="slide-body">
-                <p>동일한 두 벡터 $\vec{A}(1,2)$와 $\vec{B}(4,8)$에 대해 <b>화살표의 사이각($\theta$)</b>만을 측정해 봅시다.</p>
+                <p>동일한 두 벡터 \(\vec{A}(1,2)\)와 \(\vec{B}(4,8)\)에 대해 <b>화살표의 사이각(\(\theta\))</b>만을 측정해 봅시다.</p>
 
                 <div class="grid-2col">
                     <div class="svg-graph-box">
@@ -896,18 +929,19 @@
                     </div>
 
                     <div class="info-card card-q">
-                        <div class="card-title">🧮 코사인 유사도 계산 ($A(1,2), B(4,8)$)</div>
+                        <div class="card-title">🧮 코사인 유사도 계산 (\(\vec{A}(1,2), \vec{B}(4,8)\))</div>
                         <div class="math-box" style="font-size: 0.95rem; text-align: left;">
-                            $$\cos(\theta) = \frac{(1\times 4) + (2\times 8)}{\sqrt{1^2+2^2} \times \sqrt{4^2+8^2}} = \frac{20}{\sqrt{5}\times\sqrt{80}} = \mathbf{1.00}$$
+                            $$\cos(\theta) = \frac{(1\times4) + (2\times8)}{\sqrt{1^2+2^2} \sqrt{4^2+8^2}} = \frac{4 + 16}{\sqrt{5} \sqrt{80}}$$
+                            \(\cos(\theta) = \frac{20}{\sqrt{400}} = \frac{20}{20} = \mathbf{\textcolor{#38bdf8}{1.00}} \quad (\theta = 0^\circ)\)
                         </div>
                         <p style="font-size: 0.85rem; margin-top: 8px;">
-                            🎉 <b>정확한 판별:</b> 유클리드/맨해튼 거리는 멀었지만, 코사인 유사도는 <span class="calc-result">1.00</span> <b>(완벽히 같은 의미)</b>임을 완벽히 밝혀냅니다!
+                            🎉 <b>정확한 판별:</b> 유클리드/맨해튼 거리는 멀었지만, 코사인 유사도는 <b>1.00 (완벽히 같은 의미)</b>임을 완벽히 밝혀냅니다!
                         </p>
                     </div>
                 </div>
 
                 <div class="speaker-note">
-                    💡 <b>결론:</b> 벡터 B가 벡터 A의 정확히 4배 직선상에 존재하므로 사이각은 0도이며, 코사인값은 최대치인 <span class="calc-result">1.00</span>을 산출합니다.
+                    💡 <b>결론:</b> 벡터 B가 벡터 A의 정확히 4배 직선상에 존재하므로 사이각은 0도이며, 코사인값은 최대치인 1.00을 산출합니다.
                 </div>
             </div>
         </div>
@@ -922,13 +956,13 @@
                 <div class="slide-number">Slide 8 / 41</div>
             </div>
             <div class="slide-body">
-                <p>코사인 유사도나 유클리드 거리 대신 <b>Dot Product ($A \cdot B^T = \sum A_i B_i$)</b>를 선택한 2가지 강력한 이유가 있습니다.</p>
+                <p>코사인 유사도나 유클리드 거리 대신 <b>Dot Product (\(A \cdot B^T = \sum A_i B_i\))</b>를 선택한 2가지 강력한 이유가 있습니다.</p>
 
                 <div class="grid-2col">
                     <div class="info-card card-q">
                         <div class="card-title">1️⃣ 수학적 이유: 방향 + 크기(Magnitude)의 유용한 결합</div>
                         <ul style="margin-left: 15px; font-size: 0.88rem; line-height: 1.7;">
-                            <li>코사인 유사도 $\frac{A \cdot B}{\|A\| \|B\|}$에서 분모(길이 정규화)를 생략하면 <b>Dot Product $A \cdot B^T$</b>가 됩니다.</li>
+                            <li>코사인 유사도 \(\frac{A \cdot B}{\|A\|\|B\|}\)에서 분모(길이 정규화)를 생략하면 <b>Dot Product \(A \cdot B^T\)</b>가 됩니다.</li>
                             <li>내적은 두 단어의 <b>방향 일치성</b>뿐만 아니라, 특정 중요 단어가 갖는 <b>벡터의 크기(Magnitude/시그널 강도)</b>까지 어텐션 가중치 점수에 자연스럽게 녹여냅니다.</li>
                         </ul>
                     </div>
@@ -936,14 +970,14 @@
                     <div class="info-card card-hw">
                         <div class="card-title">2️⃣ H/W 연산 이유: NPU/GPU Tensor Core 100% 가속</div>
                         <ul style="margin-left: 15px; font-size: 0.88rem; line-height: 1.7;">
-                            <li>유클리드/맨해튼/코사인의 <b>제곱근($\sqrt{x}$), 절대값($|x|$), 나눗셈($\div$) 연산</b>은 텐서 연산 코어에서 극도로 비효율적입니다.</li>
-                            <li>반면 <b>Dot Product ($QK^T$)는 순수한 행렬 곱 GEMM/MAC (Multiply-Accumulate)</b> 연산으로, GPU/NPU의 Tensor Core 하드웨어가 가장 압도적인 TB/s 속도로 처리할 수 있습니다.</li>
+                            <li>유클리드/맨해튼/코사인의 <b>제곱근(\(\sqrt{x}\)), 절대값(\(|x|\)), 나눗셈(\(\div\)) 연산</b>은 텐서 연산 코어에서 극도로 비효율적입니다.</li>
+                            <li>반면 <b>Dot Product (\(QK^T\))는 순수한 행렬 곱 GEMM/MAC (Multiply-Accumulate)</b> 연산으로, GPU/NPU의 Tensor Core 하드웨어가 가장 압도적인 TB/s 속도로 처리할 수 있습니다.</li>
                         </ul>
                     </div>
                 </div>
 
-                <div class="formula-card" style="font-size: 1.05rem; padding: 14px;">
-                    $$\text{Dot Product }(QK^T) = \text{수학적 유용성 (방향+강도)} \times \text{H/W 연산 최적화 (GEMM/MAC } {\color{#fbbf24} \mathbf{100\%}} \text{ 가속)}$$
+                <div class="formula-card" style="font-size: 1.1rem; padding: 14px;">
+                    ⚡ Dot Product (\(QK^T\)) = 수학적 유용성 (방향+강도) × H/W 연산 최적화 (GEMM/MAC 100% 가속)
                 </div>
 
                 <div class="human-note">
@@ -960,7 +994,7 @@
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
-                    <span>9. 3차원에서 수천 차원(LLM $d=4096$)으로의 확장성</span>
+                    <span>9. 3차원에서 수천 차원(LLM \(d=4096\))으로의 확장성</span>
                     <span class="slide-title-tag tag-concept">Scalability</span>
                 </div>
                 <div class="slide-number">Slide 9 / 41</div>
@@ -970,18 +1004,20 @@
 
                 <div class="grid-2col">
                     <div class="info-card card-k">
-                        <div class="card-title">📦 3차원 공간 내적 예시 ($A(1,2,2)$ vs $B(2,4,4)$)</div>
+                        <div class="card-title">📦 3차원 공간 내적 예시 (\(\vec{A}(1,2,2)\) vs \(\vec{B}(2,4,4)\))</div>
                         <div class="math-box" style="font-size: 0.9rem; text-align: left;">
-                            $$A \cdot B^T = (1\times 2) + (2\times 4) + (2\times 4) = \mathbf{18}$$
-                            $$\cos(\theta) = \frac{18}{\sqrt{9}\times\sqrt{36}} = \frac{18}{18} = \mathbf{1.00}$$
+                            <b>Dot Product (내적):</b><br>
+                            \(A \cdot B^T = (1\times2) + (2\times4) + (2\times4) = 2 + 8 + 8 = \mathbf{18}\)<br><br>
+                            <b>코사인 유사도:</b><br>
+                            \(\cos(\theta) = \frac{18}{\sqrt{1+4+4} \sqrt{4+16+16}} = \frac{18}{3 \times 6} = \mathbf{\textcolor{#34d399}{1.00}}\)
                         </div>
                         <p style="font-size: 0.85rem; margin-top: 5px;">3차원에서도 두 화살표가 완벽히 포개어져 코사인 유사도 1.00 산출!</p>
                     </div>
 
                     <div class="info-card card-hw">
-                        <div class="card-title">🚀 수천 차원(LLM $d_{model}=4096$) 확장 원리</div>
+                        <div class="card-title">🚀 수천 차원(LLM \(d_{model}=4096\)) 확장 원리</div>
                         <ul style="margin-left: 15px; font-size: 0.88rem; line-height: 1.7;">
-                            <li>차원이 아무리 늘어나도 내적 연산은 단지 각 성분 곱의 합 $\sum_{i=1}^{4096} A_i B_i$의 단순 연장에 불과합니다.</li>
+                            <li>차원이 아무리 늘어나도 내적 연산은 단지 각 성분 곱의 합 <b>\(\sum_{i=1}^{4096} A_i B_i\) (MAC 연산)</b>의 단순 연장에 불과합니다.</li>
                             <li><b>H/W 가속 혜택:</b> 무한한 차원 확장성 덕분에 GPU/NPU의 Tensor Core가 4096차원 벡터의 내적을 병렬로 <b>0.0001ms 미만</b>으로 초고속 계산(Batched GEMM)할 수 있습니다.</li>
                         </ul>
                     </div>
@@ -1006,24 +1042,28 @@
                 <p>실제 4차원 임베딩 벡터값으로 두 단어 간 <b>내적(Dot Product) 수치</b>를 직접 계산해 봅시다.</p>
 
                 <div class="math-box">
-                    $$\text{Similarity}(A, B) = A \cdot B^T = \sum_{i=1}^d A_i B_i$$
+                    $$\text{Similarity}(A, B) = A \cdot B^T = \sum_{i=1}^{d} A_i B_i$$
                 </div>
 
                 <div class="grid-2col">
                     <div class="info-card card-score">
-                        <div class="card-title">1️⃣ $\text{Sim}(\text{King}, \text{Queen})$ 계산</div>
-                        <div class="math-box" style="font-size: 0.85rem; text-align: left; margin:5px 0;">
-                            $$[0.9, 0.9, 0.1, 0.7] \cdot [0.1, 0.9, 0.9, 0.7]^T = 0.09 + 0.81 + 0.09 + 0.49 = {\color{#fbbf24} \mathbf{1.48}}$$
+                        <div class="card-title">1️⃣ \(\text{Sim}(\text{King}, \text{Queen})\) 계산</div>
+                        <div class="code-inline" style="display:block; margin:5px 0;">
+                            [0.9, 0.9, 0.1, 0.7] · [0.1, 0.9, 0.9, 0.7]^T<br>
+                            = (0.9×0.1) + (0.9×0.9) + (0.1×0.9) + (0.7×0.7)<br>
+                            = 0.09 + 0.81 + 0.09 + 0.49 = <span class="hl-score">1.48 (높은 유사도!)</span>
                         </div>
-                        <p style="font-size: 0.85rem;">왕권과 나이 등 핵심 의미 축이 일치하여 높은 유사도(<span class="calc-result">1.48</span>) 형성.</p>
+                        <p style="font-size: 0.85rem;">왕권과 나이 등 핵심 의미 축이 일치하여 높은 유사도 형성.</p>
                     </div>
 
                     <div class="info-card card-hw">
-                        <div class="card-title">2️⃣ $\text{Sim}(\text{King}, \text{Apple})$ 계산</div>
-                        <div class="math-box" style="font-size: 0.85rem; text-align: left; margin:5px 0;">
-                            $$[0.9, 0.9, 0.1, 0.7] \cdot [0.0, 0.0, 0.0, 0.1]^T = 0 + 0 + 0 + 0.07 = {\color{#fbbf24} \mathbf{0.07}}$$
+                        <div class="card-title">2️⃣ \(\text{Sim}(\text{King}, \text{Apple})\) 계산</div>
+                        <div class="code-inline" style="display:block; margin:5px 0;">
+                            [0.9, 0.9, 0.1, 0.7] · [0.0, 0.0, 0.0, 0.1]^T (Apple)<br>
+                            = (0) + (0) + (0) + (0.07)<br>
+                            = <span class="hl-hw">0.07 (연관성 없음!)</span>
                         </div>
-                        <p style="font-size: 0.85rem;">의미 축이 일치하지 않아 내적 값이 0에 가깝게 직교함(<span class="calc-result">0.07</span>).</p>
+                        <p style="font-size: 0.85rem;">의미 축이 일치하지 않아 내적 값이 0에 가깝게 직교함.</p>
                     </div>
                 </div>
 
@@ -1048,35 +1088,35 @@
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
-                    <span>11. 전체 문장 "I LOVE YOU" & 가중치 행렬($4\times 2$) 원리</span>
+                    <span>11. 전체 문장 "I LOVE YOU" & 가중치 행렬(\(4\times2\)) 원리</span>
                     <span class="slide-title-tag tag-concept">Setup & Projection</span>
                 </div>
                 <div class="slide-number">Slide 11 / 41</div>
             </div>
             <div class="slide-body">
-                <p>문장 <b>"I LOVE YOU"</b>의 3개 단어는 <b>단 하나의 동일한 가중치 행렬($W^Q, W^K, W^V$)</b>을 통과합니다.</p>
+                <p>문장 <b>"I LOVE YOU"</b>의 3개 단어는 <b>단 하나의 동일한 가중치 행렬(\(W^Q, W^K, W^V\))</b>을 통과합니다.</p>
 
                 <div class="grid-2col">
                     <div class="info-card card-q">
                         <div class="card-title">📝 3개 단어 입력 벡터 ($d_{model}=4$)</div>
                         <ul style="margin-left: 15px; font-size: 0.88rem; line-height: 1.7;">
-                            <li>$\text{I} = [1, 0, 1, 0]$</li>
-                            <li>$\text{LOVE} = [0, 1, 0, 1]$</li>
-                            <li>$\text{YOU} = [1, 1, 0, 0]$</li>
+                            <li>\(\text{I} = [1, \, 0, \, 1, \, 0]\)</li>
+                            <li>\(\text{LOVE} = [0, \, 1, \, 0, \, 1]\)</li>
+                            <li>\(\text{YOU} = [1, \, 1, \, 0, \, 0]\)</li>
                         </ul>
                     </div>
 
                     <div class="info-card card-hw">
-                        <div class="card-title">💡 왜 가중치 행렬은 $4 \times 2$ 인가?</div>
+                        <div class="card-title">💡 왜 가중치 행렬은 \(4 \times 2\) 인가?</div>
                         <p style="font-size: 0.85rem; line-height: 1.6;">
-                            입력 4차원($d_{model}=4$) 데이터를 계산 효율성이 높은 <b>2차원($d_k=2$) 어텐션 공간으로 축소/투영(Projection)</b>하기 위함입니다.<br>
-                            $(1 \times 4) \times (4 \times 2) = (1 \times 2)$로 차원이 줄어들어 H/W 가속에 매우 유리합니다.
+                            입력 4차원(\(d_{model}=4\)) 데이터를 계산 효율성이 높은 <b>2차원(\(d_k=2\)) 어텐션 공간으로 축소/투영(Projection)</b>하기 위함입니다.<br>
+                            \((1 \times 4) \times (4 \times 2) = (1 \times 2)\)로 차원이 줄어들어 H/W 가속에 매우 유리합니다.
                         </p>
                     </div>
                 </div>
 
                 <div class="info-card card-k">
-                    <div class="card-title">⚙️ 세 단어 공통 적용 가중치 행렬 (Shared Weight Matrix)</div>
+                    <div class="card-title">⚙️ 세 단어 공통 적용 가중치 행렬 (Shared Weight)</div>
                     <div class="math-box" style="font-size: 0.85rem; margin: 4px 0;">
                         $$W^Q = \begin{bmatrix} 1 & 0 \\ 0 & 1 \\ 0 & 0 \\ 0 & 0 \end{bmatrix}, \quad W^K = \begin{bmatrix} 1 & 0 \\ 0 & 1 \\ 0 & 0 \\ 0 & 0 \end{bmatrix}, \quad W^V = \begin{bmatrix} 0 & 0 \\ 0 & 0 \\ 1 & 0 \\ 0 & 1 \end{bmatrix}$$
                     </div>
@@ -1093,18 +1133,23 @@
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
-                    <span>12. 단어 'I'의 $Q_I, K_I, V_I$ 투영 수치 계산</span>
+                    <span>12. 단어 'I'의 \(Q_I, K_I, V_I\) 투영 수치 계산</span>
                     <span class="slide-title-tag tag-math">Math Step</span>
                 </div>
                 <div class="slide-number">Slide 12 / 41</div>
             </div>
             <div class="slide-body">
-                <p>단어 <b>'I' ($[1, 0, 1, 0]$)</b>의 $Q_I, K_I, V_I$ 변환 행렬 곱 풀이 과정입니다.</p>
+                <p>단어 <b>'I' (\([1, 0, 1, 0]\))</b>의 \(Q_I, K_I, V_I\) 변환 행렬 곱 풀이 과정입니다.</p>
 
                 <div class="math-box" style="font-size: 0.88rem; text-align: left; line-height: 1.8;">
-                    $$Q_I = [1,0,1,0] \times \begin{bmatrix} 1 & 0 \\ 0 & 1 \\ 0 & 0 \\ 0 & 0 \end{bmatrix} = {\color{#fbbf24} \mathbf{[1, 0]}}$$
-                    $$K_I = [1,0,1,0] \times \begin{bmatrix} 1 & 0 \\ 0 & 1 \\ 0 & 0 \\ 0 & 0 \end{bmatrix} = {\color{#fbbf24} \mathbf{[1, 0]}}$$
-                    $$V_I = [1,0,1,0] \times \begin{bmatrix} 0 & 0 \\ 0 & 0 \\ 1 & 0 \\ 0 & 1 \end{bmatrix} = {\color{#fbbf24} \mathbf{[0, 1]}}$$
+                    <b>① Query (\(Q_I\)):</b><br>
+                    \(Q_I = [1,0,1,0] \begin{bmatrix} 1&0 \\ 0&1 \\ 0&0 \\ 0&0 \end{bmatrix} = [1\times1+0\times0+1\times0+0\times0, \; 1\times0+0\times1+1\times0+0\times0] = \mathbf{\textcolor{#38bdf8}{[1, 0]}}\)<br><br>
+                    
+                    <b>② Key (\(K_I\)):</b><br>
+                    \(K_I = [1,0,1,0] \begin{bmatrix} 1&0 \\ 0&1 \\ 0&0 \\ 0&0 \end{bmatrix} = [1\times1+0\times0+1\times0+0\times0, \; 1\times0+0\times1+1\times0+0\times0] = \mathbf{\textcolor{#34d399}{[1, 0]}}\)<br><br>
+                    
+                    <b>③ Value (\(V_I\)):</b><br>
+                    \(V_I = [1,0,1,0] \begin{bmatrix} 0&0 \\ 0&0 \\ 1&0 \\ 0&1 \end{bmatrix} = [1\times0+0\times0+1\times1+0\times0, \; 1\times0+0\times0+1\times0+0\times1] = \mathbf{\textcolor{#c084fc}{[0, 1]}}\)
                 </div>
 
                 <div class="human-note">
@@ -1112,7 +1157,7 @@
                 </div>
 
                 <div class="speaker-note">
-                    💡 <b>결과:</b> 단어 'I'는 질문 Q_I=[1,0], 키 K_I=[1,0], 내용 데이터 V_I=[0,1]로 분신 변환되었습니다.
+                    💡 <b>결과:</b> 단어 'I'는 질문 $Q_I=[1,0]$, 키 $K_I=[1,0]$, 내용 데이터 $V_I=[0,1]$로 분신 변환되었습니다.
                 </div>
             </div>
         </div>
@@ -1127,21 +1172,23 @@
                 <div class="slide-number">Slide 13 / 41</div>
             </div>
             <div class="slide-body">
-                <p>단어 'I'의 질문($Q_I$)과 자신의 키($K_I$)를 곱해 자기 자신과의 관심도 점수를 구합니다.</p>
+                <p>단어 'I'의 질문(\(Q_I\))과 자신의 키(\(K_I\))를 곱해 자기 자신과의 관심도 점수를 구합니다.</p>
 
                 <div class="grid-2col">
                     <div class="info-card card-score">
                         <div class="card-title">🎯 1. 관심도 내적 점수 (Score)</div>
                         <div class="math-box" style="font-size: 0.9rem;">
-                            $$\text{Score} = Q_I \cdot K_I^T = [1, 0] \cdot [1, 0]^T = 1\times 1 + 0\times 0 = {\color{#fbbf24} \mathbf{1.0}}$$
+                            $$\text{Score} = Q_I \cdot K_I^T = [1, 0] \cdot [1, 0]^T$$
+                            $$= (1 \times 1) + (0 \times 0) = \mathbf{1.0}$$
                         </div>
-                        <p style="font-size: 0.85rem; margin-top: 5px;">"자신의 질문과 열쇠가 100% 일치하여 점수 <span class="calc-result">1.0</span> 형성!"</p>
+                        <p style="font-size: 0.85rem; margin-top: 5px;">"자신의 질문과 열쇠가 100% 일치하여 점수 1.0 형성!"</p>
                     </div>
 
                     <div class="info-card card-v">
                         <div class="card-title">📦 2. Value 곱산 Output</div>
                         <div class="math-box" style="font-size: 0.9rem;">
-                            $$\text{Output}_I = \text{Score} \times V_I = 1.0 \times [0, 1] = {\color{#fbbf24} \mathbf{[0, 1]}}$$
+                            $$\text{Output}_I = \text{Score} \times V_I = 1.0 \times [0, 1]$$
+                            $$= \mathbf{\textcolor{#c084fc}{[0, 1]}}$$
                         </div>
                         <p style="font-size: 0.85rem; margin-top: 5px;">단어 'I'의 어텐션 결과 자기 자신의 원래 내용 데이터가 유지됩니다.</p>
                     </div>
@@ -1167,30 +1214,30 @@
                 <div class="slide-number">Slide 14 / 41</div>
             </div>
             <div class="slide-body">
-                <p>$QK^T$로 관심도 점수(Score)를 구했음에도 <b>Value(V)를 곱해야 하는 결정적 이유</b>와 <b>크기의 비밀</b>입니다.</p>
+                <p>\(QK^T\)로 관심도 점수(Score)를 구했음에도 <b>Value(\(V\))를 곱해야 하는 결정적 이유</b>와 <b>크기의 비밀</b>입니다.</p>
 
                 <div class="grid-2col">
                     <div class="info-card card-score">
                         <div class="card-title">📊 1. Score vs Value의 비유적 차이</div>
                         <ul style="margin-left: 15px; font-size: 0.88rem; line-height: 1.7;">
                             <li><b>어텐션 점수 (Score):</b> <b>"레시피 비율 지시서"</b><br>➔ *"상대 단어에 80%만큼 집중해라"*라는 <b>단순 숫자/비율일 뿐 실제 내용물 데이터가 없음!</b></li>
-                            <li><b>Value (V):</b> <b>"실제 추출할 내용물 재료"</b><br>➔ 단어가 실제로 품고 있는 구체적인 의미 데이터 내용물.</li>
+                            <li><b>Value (\(V\)):</b> <b>"실제 추출할 내용물 재료"</b><br>➔ 단어가 실제로 품고 있는 구체적인 의미 데이터 내용물.</li>
                         </ul>
                     </div>
 
                     <div class="info-card card-v">
                         <div class="card-title">🍲 2. Value를 곱해야 하는 이유 (가중합)</div>
                         <p style="font-size: 0.88rem; line-height: 1.6;">
-                            점수(숫자)는 단지 비율에 불과하므로, <b>실제 의미 내용물(V)에 이 비율(Score)을 곱해 가중합(Weighted Sum)</b>을 취해야 비로소 주변 문맥이 믹싱된 <b>최종 문맥 벡터(Context Vector)</b>가 완성됩니다!
+                            점수(숫자)는 단지 비율에 불과하므로, <b>실제 의미 내용물(\(V\))에 이 비율(Score)을 곱해 가중합(Weighted Sum)</b>을 취해야 비로소 주변 문맥이 믹싱된 <b>최종 문맥 벡터(Context Vector)</b>가 완성됩니다!
                         </p>
                     </div>
                 </div>
 
                 <div class="info-card card-hw">
-                    <div class="card-title">📐 3. Value 행렬 크기의 비밀 ($4 \times 2 \rightarrow 1 \times 2$)</div>
+                    <div class="card-title">📐 3. Value 행렬 크기의 비밀 (\(4 \times 2 \rightarrow 1 \times 2\))</div>
                     <p style="font-size: 0.85rem; line-height: 1.6;">
-                        입력 벡터($1 \times 4$)에 $W^V(4 \times 2)$를 곱하여 $V_I$가 <b>$1 \times 2$</b> 규격 그릇이 되는 이유:<br>
-                        어텐션 점수(비율)와 곱해진 후 최종 출력되는 <b>문맥 데이터의 규격 크기($d_v=2$)를 지정</b>하기 위함입니다. 2차원으로 깔끔히 규격화되어야 다음 층(Layer)이나 Multi-Head 결합 시 병렬로 합성할 수 있습니다.
+                        입력 벡터(\(1 \times 4\))에 \(W^V\)(\(4 \times 2\))를 곱하여 \(V_I\)가 <b>\(1 \times 2\)</b> 규격 그릇이 되는 이유:<br>
+                        어텐션 점수(비율)와 곱해진 후 최종 출력되는 <b>문맥 데이터의 규격 크기(\(d_v=2\))를 지정</b>하기 위함입니다. 2차원으로 깔끔히 규격화되어야 다음 층(Layer)이나 Multi-Head 결합 시 병렬로 합성할 수 있습니다.
                     </p>
                 </div>
 
@@ -1208,22 +1255,27 @@
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
-                    <span>15. 단어 'LOVE'의 $Q_L, K_L, V_L$ 투영 수치 계산</span>
+                    <span>15. 단어 'LOVE'의 \(Q_L, K_L, V_L\) 투영 수치 계산</span>
                     <span class="slide-title-tag tag-math">Math Step</span>
                 </div>
                 <div class="slide-number">Slide 15 / 41</div>
             </div>
             <div class="slide-body">
-                <p>단어 <b>'LOVE' ($[0, 1, 0, 1]$)</b>의 $Q_L, K_L, V_L$ 변환 행렬 곱 풀이 과정입니다.</p>
+                <p>단어 <b>'LOVE' (\([0, 1, 0, 1]\))</b>의 \(Q_L, K_L, V_L\) 변환 행렬 곱 풀이 과정입니다.</p>
 
                 <div class="math-box" style="font-size: 0.88rem; text-align: left; line-height: 1.8;">
-                    $$Q_L = [0,1,0,1] \times \begin{bmatrix} 1 & 0 \\ 0 & 1 \\ 0 & 0 \\ 0 & 0 \end{bmatrix} = \mathbf{[0, 1]}$$
-                    $$K_L = [0,1,0,1] \times \begin{bmatrix} 1 & 0 \\ 0 & 1 \\ 0 & 0 \\ 0 & 0 \end{bmatrix} = \mathbf{[0, 1]}$$
-                    $$V_L = [0,1,0,1] \times \begin{bmatrix} 0 & 0 \\ 0 & 0 \\ 1 & 0 \\ 0 & 1 \end{bmatrix} = \mathbf{[0, 1]}$$
+                    <b>① Query (\(Q_L\)):</b><br>
+                    \(Q_L = [0,1,0,1] \begin{bmatrix} 1&0 \\ 0&1 \\ 0&0 \\ 0&0 \end{bmatrix} = [0\times1+1\times0+0\times0+1\times0, \; 0\times0+1\times1+0\times0+1\times0] = \mathbf{\textcolor{#38bdf8}{[0, 1]}}\)<br><br>
+                    
+                    <b>② Key (\(K_L\)):</b><br>
+                    \(K_L = [0,1,0,1] \begin{bmatrix} 1&0 \\ 0&1 \\ 0&0 \\ 0&0 \end{bmatrix} = [0\times1+1\times0+0\times0+1\times0, \; 0\times0+1\times1+0\times0+1\times0] = \mathbf{\textcolor{#34d399}{[0, 1]}}\)<br><br>
+                    
+                    <b>③ Value (\(V_L\)):</b><br>
+                    \(V_L = [0,1,0,1] \begin{bmatrix} 0&0 \\ 0&0 \\ 1&0 \\ 0&1 \end{bmatrix} = [0\times0+1\times0+0\times1+1\times0, \; 0\times0+1\times0+0\times0+1\times1] = \mathbf{\textcolor{#c084fc}{[0, 1]}}\)
                 </div>
 
                 <div class="speaker-note">
-                    💡 <b>결과:</b> 단어 'LOVE'는 질문 Q_L=[0,1], 키 K_L=[0,1], 내용 데이터 V_L=[0,1]로 투영되었습니다.
+                    💡 <b>결과:</b> 단어 'LOVE'는 질문 $Q_L=[0,1]$, 키 $K_L=[0,1]$, 내용 데이터 $V_L=[0,1]$로 투영되었습니다.
                 </div>
             </div>
         </div>
@@ -1238,13 +1290,14 @@
                 <div class="slide-number">Slide 16 / 41</div>
             </div>
             <div class="slide-body">
-                <p>단어 'LOVE'의 질문($Q_L$)과 자신의 키($K_L$)를 곱해 자기 자신과의 관심도 점수를 구합니다.</p>
+                <p>단어 'LOVE'의 질문(\(Q_L\))과 자신의 키(\(K_L\))를 곱해 자기 자신과의 관심도 점수를 구합니다.</p>
 
                 <div class="grid-2col">
                     <div class="info-card card-score">
                         <div class="card-title">🎯 1. 관심도 내적 점수 (Score)</div>
                         <div class="math-box" style="font-size: 0.9rem;">
-                            $$\text{Score} = Q_L \cdot K_L^T = [0, 1] \cdot [0, 1]^T = 0\times 0 + 1\times 1 = \mathbf{1.0}$$
+                            $$\text{Score} = Q_L \cdot K_L^T = [0, 1] \cdot [0, 1]^T$$
+                            $$= (0 \times 0) + (1 \times 1) = \mathbf{1.0}$$
                         </div>
                         <p style="font-size: 0.85rem; margin-top: 5px;">"LOVE 자신의 질문과 열쇠가 100% 일치하여 점수 1.0 형성!"</p>
                     </div>
@@ -1252,7 +1305,8 @@
                     <div class="info-card card-v">
                         <div class="card-title">📦 2. Value 곱산 Output</div>
                         <div class="math-box" style="font-size: 0.9rem;">
-                            $$\text{Output}_L = \text{Score} \times V_L = 1.0 \times [0, 1] = \mathbf{[0, 1]}$$
+                            $$\text{Output}_L = \text{Score} \times V_L = 1.0 \times [0, 1]$$
+                            $$= \mathbf{\textcolor{#c084fc}{[0, 1]}}$$
                         </div>
                         <p style="font-size: 0.85rem; margin-top: 5px;">단어 'LOVE'의 어텐션 결과 자기 자신의 내용 데이터가 그대로 유지됩니다.</p>
                     </div>
@@ -1268,22 +1322,27 @@
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
-                    <span>17. 단어 'YOU'의 $Q_Y, K_Y, V_Y$ 투영 수치 계산</span>
+                    <span>17. 단어 'YOU'의 \(Q_Y, K_Y, V_Y\) 투영 수치 계산</span>
                     <span class="slide-title-tag tag-math">Math Step</span>
                 </div>
                 <div class="slide-number">Slide 17 / 41</div>
             </div>
             <div class="slide-body">
-                <p>단어 <b>'YOU' ($[1, 1, 0, 0]$)</b>의 $Q_Y, K_Y, V_Y$ 변환 행렬 곱 풀이 과정입니다.</p>
+                <p>단어 <b>'YOU' (\([1, 1, 0, 0]\))</b>의 \(Q_Y, K_Y, V_Y\) 변환 행렬 곱 풀이 과정입니다.</p>
 
                 <div class="math-box" style="font-size: 0.88rem; text-align: left; line-height: 1.8;">
-                    $$Q_Y = [1,1,0,0] \times \begin{bmatrix} 1 & 0 \\ 0 & 1 \\ 0 & 0 \\ 0 & 0 \end{bmatrix} = \mathbf{[1, 1]}$$
-                    $$K_Y = [1,1,0,0] \times \begin{bmatrix} 1 & 0 \\ 0 & 1 \\ 0 & 0 \\ 0 & 0 \end{bmatrix} = \mathbf{[1, 1]}$$
-                    $$V_Y = [1,1,0,0] \times \begin{bmatrix} 0 & 0 \\ 0 & 0 \\ 1 & 0 \\ 0 & 1 \end{bmatrix} = \mathbf{[0, 0]}$$
+                    <b>① Query (\(Q_Y\)):</b><br>
+                    \(Q_Y = [1,1,0,0] \begin{bmatrix} 1&0 \\ 0&1 \\ 0&0 \\ 0&0 \end{bmatrix} = [1\times1+1\times0+0\times0+0\times0, \; 1\times0+1\times1+0\times0+0\times0] = \mathbf{\textcolor{#38bdf8}{[1, 1]}}\)<br><br>
+                    
+                    <b>② Key (\(K_Y\)):</b><br>
+                    \(K_Y = [1,1,0,0] \begin{bmatrix} 1&0 \\ 0&1 \\ 0&0 \\ 0&0 \end{bmatrix} = [1\times1+1\times0+0\times0+0\times0, \; 1\times0+1\times1+0\times0+0\times0] = \mathbf{\textcolor{#34d399}{[1, 1]}}\)<br><br>
+                    
+                    <b>③ Value (\(V_Y\)):</b><br>
+                    \(V_Y = [1,1,0,0] \begin{bmatrix} 0&0 \\ 0&0 \\ 1&0 \\ 0&1 \end{bmatrix} = [1\times0+1\times0+0\times1+0\times0, \; 1\times0+1\times0+0\times0+0\times1] = \mathbf{\textcolor{#c084fc}{[0, 0]}}\)
                 </div>
 
                 <div class="speaker-note">
-                    💡 <b>결과:</b> 단어 'YOU'는 질문 Q_Y=[1,1], 키 K_Y=[1,1], 내용 데이터 V_Y=[0,0]로 투영되었습니다.
+                    💡 <b>결과:</b> 단어 'YOU'는 질문 $Q_Y=[1,1]$, 키 $K_Y=[1,1]$, 내용 데이터 $V_Y=[0,0]$로 투영되었습니다.
                 </div>
             </div>
         </div>
@@ -1298,28 +1357,30 @@
                 <div class="slide-number">Slide 18 / 41</div>
             </div>
             <div class="slide-body">
-                <p>단어 'YOU'의 질문($Q_Y$)과 자신의 키($K_Y$)를 곱해 자기 자신과의 관심도 점수를 구합니다.</p>
+                <p>단어 'YOU'의 질문(\(Q_Y\))과 자신의 키(\(K_Y\))를 곱해 자기 자신과의 관심도 점수를 구합니다.</p>
 
                 <div class="grid-2col">
                     <div class="info-card card-score">
                         <div class="card-title">🎯 1. 관심도 내적 점수 (Score)</div>
                         <div class="math-box" style="font-size: 0.9rem;">
-                            $$\text{Score} = Q_Y \cdot K_Y^T = [1, 1] \cdot [1, 1]^T = 1\times 1 + 1\times 1 = {\color{#fbbf24} \mathbf{2.0}}$$
+                            $$\text{Score} = Q_Y \cdot K_Y^T = [1, 1] \cdot [1, 1]^T$$
+                            $$= (1 \times 1) + (1 \times 1) = \mathbf{2.0}$$
                         </div>
-                        <p style="font-size: 0.85rem; margin-top: 5px;">"YOU는 성분이 2개 포함되어 점수가 <span class="calc-result">2.0</span> 형성!"</p>
+                        <p style="font-size: 0.85rem; margin-top: 5px;">"YOU는 성분이 2개 포함되어 점수가 2.0 형성!"</p>
                     </div>
 
                     <div class="info-card card-v">
                         <div class="card-title">📦 2. Value 곱산 Output</div>
                         <div class="math-box" style="font-size: 0.9rem;">
-                            $$\text{Output}_Y = \text{Score} \times V_Y = 2.0 \times [0, 0] = {\color{#fbbf24} \mathbf{[0, 0]}}$$
+                            $$\text{Output}_Y = \text{Score} \times V_Y = 2.0 \times [0, 0]$$
+                            $$= \mathbf{\textcolor{#c084fc}{[0, 0]}}$$
                         </div>
                         <p style="font-size: 0.85rem; margin-top: 5px;">점수가 2.0이어도 Value 내용 데이터가 [0,0]이므로 출력이 [0,0]이 됩니다.</p>
                     </div>
                 </div>
 
                 <div class="speaker-note">
-                    💡 <b>확인 완료:</b> 3개 단어(I, LOVE, YOU) 모두 개별 Q, K, V 생성 수식과 내적 점수가 완전히 검증되었습니다.
+                    💡 <b>확인 완료:</b> 3개 단어(I, LOVE, YOU) 모두 개별 $Q, K, V$ 생성 수식과 내적 점수가 완전히 검증되었습니다.
                 </div>
             </div>
         </div>
@@ -1328,41 +1389,34 @@
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
-                    <span>19. "I LOVE YOU" 어텐션 행렬 내적 ($QK^T$)의 수치별 의미</span>
+                    <span>19. "I LOVE YOU" 어텐션 행렬 내적 (\(QK^T\))의 수치별 의미</span>
                     <span class="slide-title-tag tag-math">Matrix Attention</span>
                 </div>
                 <div class="slide-number">Slide 19 / 41</div>
             </div>
             <div class="slide-body">
-                <p>3개 단어의 어텐션 행렬 내적 결과인 <b>$QK^T$ 성분 수치</b>가 왜 1이고 0이며 2인지를 살펴봅시다.</p>
+                <p>3개 단어의 어텐션 행렬 내적 결과인 <b>\(QK^T\) 성분 수치</b>가 왜 1이고 0이며 2인지를 살펴봅시다.</p>
 
                 <div class="math-box" style="font-size: 0.88rem; text-align: center;">
-                    $$QK^T = \begin{bmatrix} Q_I \\ Q_L \\ Q_Y \end{bmatrix} \begin{bmatrix} K_I^T & K_L^T & K_Y^T \end{bmatrix} = \begin{bmatrix} 1 & 0 \\ 0 & 1 \\ 1 & 1 \end{bmatrix} \begin{bmatrix} 1 & 0 & 1 \\ 0 & 1 & 1 \end{bmatrix} = \begin{bmatrix} 1 & 0 & 1 \\ 0 & 1 & 1 \\ 1 & 1 & 2 \end{bmatrix}$$
+                    $$QK^T = \begin{bmatrix} Q_I \\ Q_L \\ Q_Y \end{bmatrix} \begin{bmatrix} K_I & K_L & K_Y \end{bmatrix} = \begin{bmatrix} 1 & 0 \\ 0 & 1 \\ 1 & 1 \end{bmatrix} \begin{bmatrix} 1 & 0 & 1 \\ 0 & 1 & 1 \end{bmatrix} = \begin{bmatrix} \mathbf{1} & \mathbf{0} & \mathbf{1} \\ \mathbf{0} & \mathbf{1} & \mathbf{1} \\ \mathbf{1} & \mathbf{1} & \mathbf{2} \end{bmatrix}$$
                 </div>
 
                 <div class="grid-2col">
                     <div class="info-card card-q">
                         <div class="card-title">🔍 Row 1 ('I' 단어의 질문 $Q_I=[1,0]$)</div>
-                        <ul style="margin-left: 10px; list-style: none; font-size: 0.84rem; line-height: 1.5;">
-                            <li><b>• 1행 1열 (<span class="calc-result">1점</span>):</b> $Q_I \cdot K_I^T = [1,0]\cdot[1,0]^T = \mathbf{1}$</li>
-                            <div class="human-note">➔ <i>"자기 자신('I')과의 키가 일치하여 유사도 <b>1점 획득!</b>"</i></div>
-                            <li style="margin-top: 6px;"><b>• 1행 2열 (<span class="calc-result">0점</span>):</b> $Q_I \cdot K_L^T = [1,0]\cdot[0,1]^T = \mathbf{0}$</li>
-                            <div class="human-note">➔ <i>"I의 질문과 LOVE의 키([0,1])가 엇갈려 유사도 <b>0점(무관심)!</b>"</i></div>
-                            <li style="margin-top: 6px;"><b>• 1행 3열 (<span class="calc-result">1점</span>):</b> $Q_I \cdot K_Y^T = [1,0]\cdot[1,1]^T = \mathbf{1}$</li>
-                            <div class="human-note">➔ <i>"I의 질문 성분이 YOU의 키에 포함되어 연관성 <b>1점!</b>"</i></div>
+                        <ul style="margin-left: 15px; font-size: 0.85rem; line-height: 1.6;">
+                            <li><b>1행 1열 (\(\mathbf{1}\)점):</b> \(Q_I \cdot K_I^T = [1,0]\cdot[1,0]^T = \mathbf{1}\)<br>➔ *"자기 자신('I')과의 키가 일치하여 유사도 1점!"*</li>
+                            <li><b>1행 2열 (\(\mathbf{0}\)점):</b> \(Q_I \cdot K_L^T = [1,0]\cdot[0,1]^T = \mathbf{0}\)<br>➔ *"I의 질문과 LOVE의 키([0,1])가 엇갈려 유사도 0점!"*</li>
+                            <li><b>1행 3열 (\(\mathbf{1}\)점):</b> \(Q_I \cdot K_Y^T = [1,0]\cdot[1,1]^T = \mathbf{1}\)<br>➔ *"I의 질문 성분이 YOU의 키에 포함되어 연관성 1점!"*</li>
                         </ul>
                     </div>
 
                     <div class="info-card card-k">
                         <div class="card-title">🔍 Row 3 ('YOU' 단어의 질문 $Q_Y=[1,1]$)</div>
-                        <ul style="margin-left: 10px; list-style: none; font-size: 0.84rem; line-height: 1.5;">
-                            <li><b>• 3행 1열 (<span class="calc-result">1점</span>):</b> $Q_Y \cdot K_I^T = [1,1]\cdot[1,0]^T = \mathbf{1}$</li>
-                            <div class="human-note">➔ <i>"YOU의 질문과 I의 키 성분이 통하여 <b>1점!</b>"</i></div>
-                            <li style="margin-top: 6px;"><b>• 3행 2열 (<span class="calc-result">1점</span>):</b> $Q_Y \cdot K_L^T = [1,1]\cdot[0,1]^T = \mathbf{1}$</li>
-                            <div class="human-note">➔ <i>"YOU의 질문과 LOVE의 키 성분이 통하여 <b>1점!</b>"</i></div>
-                            <li style="margin-top: 6px;"><b>• 3행 3열 (<span class="calc-result">2점</span>):</b> $Q_Y \cdot K_Y^T = [1,1]\cdot[1,1]^T = 1 + 1 = {\color{#fbbf24} \mathbf{2}}$</li>
-                            <li style="margin-top: 6px;"><b>• 3행 3열 (<span class="calc-result">2점</span>):</b> $Q_Y \cdot K_Y^T = [1,1]\cdot[1,1]^T = 1 + 1 = \mathbf{2}$</li>
-                            <div class="human-note">➔ <i>"YOU의 2개 질문 성분이 키와 모두 완벽 일치하여 <b>2점 대박 타격!</b>"</i></div>
+                        <ul style="margin-left: 15px; font-size: 0.85rem; line-height: 1.6;">
+                            <li><b>3행 1열 (\(\mathbf{1}\)점):</b> \(Q_Y \cdot K_I^T = [1,1]\cdot[1,0]^T = \mathbf{1}\) (I와 1점)</li>
+                            <li><b>3행 2열 (\(\mathbf{1}\)점):</b> \(Q_Y \cdot K_L^T = [1,1]\cdot[0,1]^T = \mathbf{1}\) (LOVE와 1점)</li>
+                            <li><b>3행 3열 (\(\mathbf{2}\)점):</b> \(Q_Y \cdot K_Y^T = [1,1]\cdot[1,1]^T = 1+1 = \mathbf{2}\)<br>➔ *"YOU의 2개 질문 성분이 키와 모두 일치하여 2점 타격!"*</li>
                         </ul>
                     </div>
                 </div>
@@ -1373,24 +1427,46 @@
             </div>
         </div>
 
-        <!-- Slide 20: Full Attention Step 1 - Calculation of Attention Score -->
+        <!-- Slide 20: Isolated 'I' Meets Context - Evolution of Attention Score -->
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
-                    <span>20. [Step 1] 단어 'I'의 어텐션 스코어 계산 ($Q_I \cdot K^T$)</span>
-                    <span class="slide-title-tag tag-math">Attention Step 1</span>
+                    <span>20. [종합 1/3] 혼자 있던 'I'가 문맥을 만나는 순간</span>
+                    <span class="slide-title-tag tag-concept">QKV Synthesis</span>
                 </div>
                 <div class="slide-number">Slide 20 / 41</div>
             </div>
             <div class="slide-body">
+                <p>독립 단어 벡터였던 'I'가 어텐션 연산 \([1, 0, 1]\)을 통해 <b>문맥에 반응하는 단어로 변신하는 핵심 원리</b>입니다.</p>
+
+                <div class="grid-2col">
+                    <div class="info-card card-hw">
+                        <div class="card-title">🧍 1. Before: 혼자 있던 외토리 단어 'I'</div>
+                        <div class="code-inline" style="display:block; margin:6px 0; font-size:0.95rem;">
+                            \(X_I = [1, \, 0, \, 1, \, 0]\) (사전적 고정 벡터)
+                        </div>
+                        <p style="font-size: 0.85rem; line-height: 1.6;">
+                            주변 문맥("love you")이 무엇이든 항상 똑같은 뜻을 갖는 외롭고 고정된 4차원 데이터에 불과했습니다.
+                        </p>
+                    </div>
+
+                    <div class="info-card card-score">
+                        <div class="card-title">🌐 2. After: 어텐션 스코어 1행 \([1, 0, 1]\) 변신</div>
+                        <div class="math-box" style="font-size:0.9rem; margin:6px 0;">
+                            \(Q_I \cdot K^T = \mathbf{\textcolor{#fbbf24}{[1, \; 0, \; 1]}} \quad (\text{I}, \; \text{LOVE}, \; \text{YOU})\)
+                        </div>
+                        <p style="font-size: 0.85rem; line-height: 1.6;">
+                            • <b>\(I \rightarrow I\) (1점, 높음):</b> 주어인 자기 자신과 강한 어텐션!<br>
+                            • <b>\(I \rightarrow LOVE\) (0점, 낮음):</b> 동사 LOVE와는 상대적으로 어텐션 떨어짐.<br>
+                            • <b>\(I \rightarrow YOU\) (1점, 높음):</b> 목적어 YOU와 강한 어텐션!
                         </p>
                     </div>
                 </div>
 
                 <div class="info-card card-q">
-                    <div class="card-title">💡 어텐션 스코어 $[1, 0, 1]$의 수치적 극적 의미</div>
+                    <div class="card-title">💡 어텐션 스코어 \([1, 0, 1]\)의 수치적 극적 의미</div>
                     <p style="font-size: 0.9rem;">
-                        단어 'I'는 혼자 있던 사전적 의미에서 벗어나, <b>"나(I)와 목적어(YOU)에 강하게 어텐션을 기울이고 LOVE는 낮추어 바라보라"</b>는 전체 문장에 맞춘 <b>관심도 스칼라 집합</b>으로 진화했습니다!
+                        단어 'I'는 혼자 있던 사전적 의미에서 벗어나, <b>"나($I$)와 목적어($YOU$)에 강하게 어텐션을 기울이고 $LOVE$는 낮추어 바라보라"</b>는 전체 문장에 맞춘 <b>관심도 스칼라 집합</b>으로 진화했습니다!
                     </p>
                 </div>
 
@@ -1399,7 +1475,7 @@
                 </div>
 
                 <div class="speaker-note">
-                    💡 <b>종합 1단계:</b> QKᵀ의 1행 [1,0,1]은 단순히 점수가 아니라, 문장 속에서 I가 누구를 얼마나 주의 깊게(Attention) 보아야 하는지의 지도로 변신한 것입니다.
+                    💡 <b>종합 1단계:</b> QK^T의 1행 [1,0,1]은 단순히 점수가 아니라, 문장 속에서 I가 누구를 얼마나 주의 깊게(Attention) 보아야 하는지의 지도로 변신한 것입니다.
                 </div>
             </div>
         </div>
@@ -1408,30 +1484,31 @@
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
-                    <span>21. [종합 2/3] 점수판 $[1,0,1]$에 Value(V)를 곱해 '진짜 문맥 정보' 완성하기</span>
+                    <span>21. [종합 2/3] 점수판 \([1,0,1]\)에 Value(V)를 곱해 '진짜 문맥 정보' 완성하기</span>
                     <span class="slide-title-tag tag-math">QKV Synthesis</span>
                 </div>
                 <div class="slide-number">Slide 21 / 41</div>
             </div>
             <div class="slide-body">
-                <p>점수판 $[1,0,1]$은 비율(지시서)일 뿐입니다. 여기에 <b>의미 실체인 Value(V)를 곱해 가중합</b>을 완성합니다.</p>
+                <p>점수판 \([1,0,1]\)은 비율(지시서)일 뿐입니다. 여기에 <b>의미 실체인 Value(\(V\))를 곱해 가중합</b>을 완성합니다.</p>
 
                 <div class="math-box" style="font-size: 0.95rem; text-align: center; line-height: 1.8;">
-                    $$\text{Output}_I = \text{Score}_I \times V = [1, 0, 1] \begin{bmatrix} [0,1] \\ [0,1] \\ [0,0] \end{bmatrix} = 1[0,1] + 0[0,1] + 1[0,0] = {\color{#fbbf24} \mathbf{[0, 1]}}$$
+                    $$\text{Output}_I = \text{Score}_I \times V = [1, \; 0, \; 1] \begin{bmatrix} V_I \\ V_L \\ V_Y \end{bmatrix} = [1, \; 0, \; 1] \begin{bmatrix} [0, 1] \\ [0, 1] \\ [0, 0] \end{bmatrix}$$
+                    $$= 1 \times [0, 1] + 0 \times [0, 1] + 1 \times [0, 0] = \mathbf{\textcolor{#c084fc}{[0, 1]}}$$
                 </div>
 
                 <div class="grid-2col">
                     <div class="info-card card-score">
-                        <div class="card-title">📜 1. 어텐션 스코어 점수판 $[1, 0, 1]$</div>
+                        <div class="card-title">📜 1. 어텐션 스코어 점수판 \([1, 0, 1]\)</div>
                         <p style="font-size: 0.85rem; line-height: 1.6;">
                             "I 정보 100% 믹싱 + LOVE 정보 0% 믹싱 + YOU 정보 100% 믹싱하라"는 가중치 지시서입니다.
                         </p>
                     </div>
 
                     <div class="info-card card-v">
-                        <div class="card-title">📦 2. Value(V) 결합을 통한 실체 완성</div>
+                        <div class="card-title">📦 2. Value(\(V\)) 결합을 통한 실체 완성</div>
                         <p style="font-size: 0.85rem; line-height: 1.6;">
-                            지시서 비율에 맞춰 실제 내용물 $V_I([0,1]), V_L([0,1]), V_Y([0,0])$를 더해줌으로써 비로소 <b>실제 문맥 정보가 담긴 수치 벡터 <span class="calc-result">[0, 1]</span></b>로 완성됩니다!
+                            지시서 비율에 맞춰 실제 내용물 \(V_I([0,1])\), \(V_L([0,1])\), \(V_Y([0,0])\)를 더해줌으로써 비로소 <b>실제 문맥 정보가 담긴 수치 벡터 \([0, 1]\)</b>로 완성됩니다!
                         </p>
                     </div>
                 </div>
@@ -1461,13 +1538,13 @@
                 <div class="grid-2col">
                     <div class="info-card card-q">
                         <div class="card-title">Step 1. 입력 벡터 ($X_I$)</div>
-                        <div class="math-box" style="font-size:0.85rem;">$$X_I = [1, 0, 1, 0]$$</div>
+                        <div class="code-inline" style="display:block; margin:4px 0;">\(X_I = [1, 0, 1, 0]\)</div>
                         <p style="font-size: 0.83rem;">문장 속에 들어가기 전 사전적 고정 단어 벡터</p>
                     </div>
 
                     <div class="info-card card-k">
                         <div class="card-title">Step 2. Q, K, V 분신 투영</div>
-                        <div class="math-box" style="font-size:0.85rem;">$$Q_I=[1,0], \, K_I=[1,0], \, V_I=[0,1]$$</div>
+                        <div class="code-inline" style="display:block; margin:4px 0;">\(Q_I=[1,0], \; K_I=[1,0], \; V_I=[0,1]\)</div>
                         <p style="font-size: 0.83rem;">공통 가중치 W를 곱해 질문, 열쇠, 내용물로 분신</p>
                     </div>
                 </div>
@@ -1475,13 +1552,13 @@
                 <div class="grid-2col">
                     <div class="info-card card-score">
                         <div class="card-title">Step 3. 어텐션 스코어 ($Q_I \cdot K^T$)</div>
-                        <div class="math-box" style="font-size:0.85rem;">$$\text{Score}_I = {\color{#fbbf24} \mathbf{[1, 0, 1]}}$$</div>
+                        <div class="code-inline" style="display:block; margin:4px 0;">\(\text{Score}_I = [1, 0, 1]\)</div>
                         <p style="font-size: 0.83rem;">전체 문장(I, love, you) 속 개별 주목도 스칼라 집합</p>
                     </div>
 
                     <div class="info-card card-v">
                         <div class="card-title">Step 4. Value 가중합 ($\text{Score} \times V$)</div>
-                        <div class="math-box" style="font-size:0.85rem;">$$\text{Context Vector}_I = {\color{#fbbf24} \mathbf{[0, 1]}}$$</div>
+                        <div class="code-inline" style="display:block; margin:4px 0;">\(\text{Context Vector}_I = [0, 1]\)</div>
                         <p style="font-size: 0.83rem;">점수 비율로 Value를 섞어 맥락 정보가 완성된 최종 엠베딩!</p>
                     </div>
                 </div>
@@ -1502,12 +1579,14 @@
                 <div class="slide-number">Slide 23 / 41</div>
             </div>
             <div class="slide-body">
-                <p>단어 1개씩이 아닌, <b>문장 전체 3개 단어의 Q, K, V 행렬 곱산($3 \times 2$)</b>을 일괄 수행합니다.</p>
+                <p>단어 1개씩이 아닌, <b>문장 전체 3개 단어의 Q, K, V 행렬 곱산(\(3 \times 2\))</b>을 일괄 수행합니다.</p>
 
                 <div class="math-box" style="font-size: 0.88rem; text-align: left; line-height: 1.7;">
-                    $$Q = X \cdot W^Q = \begin{bmatrix} 1 & 0 & 1 & 0 \\ 0 & 1 & 0 & 1 \\ 1 & 1 & 0 & 0 \end{bmatrix} \begin{bmatrix} 1 & 0 \\ 0 & 1 \\ 0 & 0 \\ 0 & 0 \end{bmatrix} = \mathbf{\begin{bmatrix} \color{#fbbf24}{1} & \color{#fbbf24}{0} \\ \color{#fbbf24}{0} & \color{#fbbf24}{1} \\ \color{#fbbf24}{1} & \color{#fbbf24}{1} \end{bmatrix}}$$
-                    $$K = \mathbf{\begin{bmatrix} \color{#fbbf24}{1} & \color{#fbbf24}{0} \\ \color{#fbbf24}{0} & \color{#fbbf24}{1} \\ \color{#fbbf24}{1} & \color{#fbbf24}{1} \end{bmatrix}}, \quad V = \mathbf{\begin{bmatrix} \color{#fbbf24}{0} & \color{#fbbf24}{1} \\ \color{#fbbf24}{0} & \color{#fbbf24}{1} \\ \color{#fbbf24}{0} & \color{#fbbf24}{0} \end{bmatrix}}$$
-                    $$\text{Output} = (QK^T) \cdot V = \begin{bmatrix} 1 & 0 & 1 \\ 0 & 1 & 1 \\ 1 & 1 & 2 \end{bmatrix} \begin{bmatrix} 0 & 1 \\ 0 & 1 \\ 0 & 0 \end{bmatrix} = \mathbf{\begin{bmatrix} \color{#fbbf24}{0} & \color{#fbbf24}{1} \\ \color{#fbbf24}{0} & \color{#fbbf24}{1} \\ \color{#fbbf24}{0} & \color{#fbbf24}{2} \end{bmatrix}}$$
+                    <b>① 입력 행렬 \(X_{3 \times 4}\) 의 Q, K, V 행렬 투영 (\(3 \times 2\)):</b><br>
+                    \(Q = X \cdot W^Q = \begin{bmatrix} 1&0&1&0 \\ 0&1&0&1 \\ 1&1&0&0 \end{bmatrix} \begin{bmatrix} 1&0 \\ 0&1 \\ 0&0 \\ 0&0 \end{bmatrix} = \mathbf{\textcolor{#38bdf8}{\begin{bmatrix} 1&0 \\ 0&1 \\ 1&1 \end{bmatrix}_{3 \times 2}}}, \quad K = \mathbf{\textcolor{#34d399}{\begin{bmatrix} 1&0 \\ 0&1 \\ 1&1 \end{bmatrix}_{3 \times 2}}}, \quad V = \mathbf{\textcolor{#c084fc}{\begin{bmatrix} 0&1 \\ 0&1 \\ 0&0 \end{bmatrix}_{3 \times 2}}}\)<br><br>
+
+                    <b>② 문장 전체 3개 단어 어텐션 최종 Output 행렬 (\(QK^T \cdot V\)):</b><br>
+                    \(\text{Output} = QK^T \cdot V = \begin{bmatrix} 1&0&1 \\ 0&1&1 \\ 1&1&2 \end{bmatrix} \begin{bmatrix} 0&1 \\ 0&1 \\ 0&0 \end{bmatrix} = \mathbf{\begin{bmatrix} \textcolor{#c084fc}{[0, 1]} & \leftarrow \text{'I' 의 어텐션 Output} \\ \textcolor{#c084fc}{[0, 1]} & \leftarrow \text{'LOVE' 의 어텐션 Output} \\ \textcolor{#c084fc}{[0, 2]} & \leftarrow \text{'YOU' 의 어텐션 Output} \end{bmatrix}_{3 \times 2}}\)
                 </div>
 
                 <div class="info-card card-hw">
@@ -1518,7 +1597,7 @@
                 </div>
 
                 <div class="human-note">
-                    💡 <b>문과적 직관 해석:</b> "하나씩 따지면 백날 걸릴 어텐션 연산을 $3 \times 2$ 거대한 하나의 행렬로 통째로 묶어서 반도체 텐서 연산기에 던지면, 단 1회 연산만으로 온 문장의 어텐션이 초고속 한방 병렬로 끝납니다!"
+                    💡 <b>문과적 직관 해석:</b> "하나씩 따지면 백날 걸릴 어텐션 연산을 \(3 \times 2\) 거대한 하나의 행렬로 통째로 묶어서 반도체 텐서 연산기에 던지면, 단 1회 연산만으로 온 문장의 어텐션이 초고속 한방 병렬로 끝납니다!"
                 </div>
 
                 <div class="speaker-note">
@@ -1537,10 +1616,10 @@
                 <div class="slide-number">Slide 24 / 41</div>
             </div>
             <div class="slide-body">
-                <p>내적 점수 $QK^T$ (1, 0, 2 등)는 거친 임의의 점수입니다. <b>Softmax</b>는 이를 <b>합이 1.0(100%)인 확률 비율</b>로 변환합니다.</p>
+                <p>내적 점수 \(QK^T\) (\(1, 0, 2\) 등)는 거친 임의의 점수입니다. <b>Softmax</b>는 이를 <b>합이 1.0(100%)인 확률 비율</b>로 변환합니다.</p>
 
                 <div class="math-box" style="font-size: 1.1rem; text-align: center;">
-                    $$\text{Softmax}(z_i) = \frac{e^{z_i}}{\sum_j e^{z_j}}$$
+                    $$\text{Softmax}(z_i) = \frac{e^{z_i}}{\sum_{j} e^{z_j}}$$
                 </div>
 
                 <div class="grid-3col">
@@ -1550,8 +1629,8 @@
                     </div>
 
                     <div class="info-card card-k">
-                        <div class="card-title" style="font-size: 0.95rem;">2️⃣ 항상 양수 ($> 0$) 보장</div>
-                        <p style="font-size: 0.83rem;">$e^z > 0$ 이므로 음수 점수가 와도 안전하게 양수 확률로 정제함.</p>
+                        <div class="card-title" style="font-size: 0.95rem;">2️⃣ 항상 양수 (\(>0\)) 보장</div>
+                        <p style="font-size: 0.83rem;">\(e^z > 0\) 이므로 음수 점수가 와도 안전하게 양수 확률로 정제함.</p>
                     </div>
 
                     <div class="info-card card-score">
@@ -1574,16 +1653,16 @@
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
-                    <span>25. [Softmax 2/3] 왜 하필 $e^x$ (자연상수 e)를 쓸까? — 딥러닝 미분의 비밀</span>
+                    <span>25. [Softmax 2/3] 왜 하필 \(e^x\) (자연상수 e)를 쓸까? — 딥러닝 미분의 비밀</span>
                     <span class="slide-title-tag tag-math">Derivative Secret</span>
                 </div>
                 <div class="slide-number">Slide 25 / 41</div>
             </div>
             <div class="slide-body">
-                <p>지수함수 중 왜 일반 숫자($2^x, 10^x$) 대신 <b>자연상수 $e$ ($e \approx 2.718$)</b>를 사용하는지의 수학적 이점입니다.</p>
+                <p>지수함수 중 왜 일반 숫자(\(2^x, 10^x\)) 대신 <b>자연상수 \(e\) (\(e \approx 2.718\))</b>를 사용하는지의 수학적 이점입니다.</p>
 
                 <div class="formula-card" style="font-size: 1.3rem;">
-                    $$\frac{d}{dx} (e^x) = e^x \quad (\text{미분을 해도 자기 자신 그대로!})$$
+                    $$\frac{d}{dx} (e^x) = e^x \quad \text{\large(미분을 해도 자기 자신 그대로!)}$$
                 </div>
 
                 <div class="grid-2col">
@@ -1591,7 +1670,7 @@
                         <div class="card-title">⚡ 1. 딥러닝 역전파(Backpropagation) 연산 초고속화</div>
                         <p style="font-size: 0.88rem; line-height: 1.6;">
                             딥러닝 오차 역전파 학습 시 수억 개의 가중치를 <b>편미분</b>해야 합니다.<br>
-                            자연상수 $e^x$는 미분 결과가 지저분한 상수가 붙지 않고 <b>자기 자신($e^x$)으로 유도</b>되어, NPU/GPU 역전파 <b>기울기 계산이 극도로 단순화</b>되고 가속됩니다!
+                            자연상수 \(e^x\)는 미분 결과가 지저분한 상수가 붙지 않고 <b>자기 자신(\(e^x\))으로 유도</b>되어, NPU/GPU 역전파 <b>기울기 계산이 극도로 단순화</b>되고 가속됩니다!
                         </p>
                     </div>
 
@@ -1604,7 +1683,7 @@
                 </div>
 
                 <div class="human-note">
-                    💡 <b>문과적 직관 해석:</b> "미분을 아무리 해도 자기 자신이 그대로 유지되는 기적의 수 $e^x$! 이 덕분에 딥러닝 미분 계산 시 지저분한 숫자가 안 붙어 GPU/NPU 반도체가 엄청난 계산 시간을 아끼게 됩니다."
+                    💡 <b>문과적 직관 해석:</b> "미분을 아무리 해도 자기 자신이 그대로 유지되는 기적의 수 \(e^x\)! 이 덕분에 딥러닝 미분 계산 시 지저분한 숫자가 안 붙어 GPU/NPU 반도체가 엄청난 계산 시간을 아끼게 됩니다."
                 </div>
 
                 <div class="speaker-note">
@@ -1617,20 +1696,20 @@
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
-                    <span>26. [Softmax 3/3] 그래서 왜 $QK^T$ 내적 곱 뒤에 Softmax를 적용해야 하는가?</span>
+                    <span>26. [Softmax 3/3] 그래서 왜 \(QK^T\) 내적 곱 뒤에 Softmax를 적용해야 하는가?</span>
                     <span class="slide-title-tag tag-concept">Pipeline Connection</span>
                 </div>
                 <div class="slide-number">Slide 26 / 41</div>
             </div>
             <div class="slide-body">
-                <p>거친 내적 점수판 $QK^T$에 <b>Softmax를 씌워 Value(V)와 결합하는 완벽한 파이프라인</b>입니다.</p>
+                <p>거친 내적 점수판 \(QK^T\)에 <b>Softmax를 씌워 Value(\(V\))와 결합하는 완벽한 파이프라인</b>입니다.</p>
 
                 <div class="pipeline-flow" style="margin: 15px 0;">
-                    <div class="pipeline-step active-step">거친 점수판 $QK^T$<br><span style="font-size:0.75rem; color:var(--text-sub);">[1.0, 0.0, 1.0]</span></div>
+                    <div class="pipeline-step active-step">거친 점수판 \(QK^T\)<br><span style="font-size:0.75rem; color:var(--text-sub);">[1.0, 0.0, 1.0]</span></div>
                     <div class="pipeline-arrow">→</div>
-                    <div class="pipeline-step active-step" style="border-color:var(--score-color); background:rgba(251,191,36,0.1);">Softmax 확률화<br><span style="font-size:0.75rem; color:var(--score-color);"><span class="calc-result">[0.42, 0.16, 0.42]</span> (합 1.0)</span></div>
+                    <div class="pipeline-step active-step" style="border-color:var(--score-color); background:rgba(251,191,36,0.1);">Softmax 확률화<br><span style="font-size:0.75rem; color:var(--score-color);">[0.42, 0.16, 0.42] (합 1.0)</span></div>
                     <div class="pipeline-arrow">→</div>
-                    <div class="pipeline-step active-step" style="border-color:var(--v-color); background:rgba(192,132,252,0.1);">Value(V) 가중합<br><span style="font-size:0.75rem; color:var(--v-color);">$0.42 V_I + 0.16 V_L + 0.42 V_Y$</span></div>
+                    <div class="pipeline-step active-step" style="border-color:var(--v-color); background:rgba(192,132,252,0.1);">Value(\(V\)) 가중합<br><span style="font-size:0.75rem; color:var(--v-color);">\(0.42 V_I + 0.16 V_L + 0.42 V_Y\)</span></div>
                 </div>
 
                 <div class="grid-2col">
@@ -1644,7 +1723,7 @@
                     <div class="info-card card-v">
                         <div class="card-title">✅ Softmax 적용 후의 완벽한 가중합</div>
                         <p style="font-size: 0.85rem;">
-                            모든 어텐션 비율의 합이 <b>정확히 100% (1.0)</b>로 고정되어, Value 의미 데이터를 <span class="calc-result">42% : 16% : 42%</span> 비율로 <b>안전하고 정갈하게 가중합</b>합니다!
+                            모든 어텐션 비율의 합이 <b>정확히 100% (1.0)</b>로 고정되어, Value 의미 데이터를 $42\% : 16\% : 42\%$ 비율로 <b>안전하고 정갈하게 가중합</b>합니다!
                         </p>
                     </div>
                 </div>
@@ -1669,27 +1748,27 @@
                 <div class="slide-number">Slide 27 / 41</div>
             </div>
             <div class="slide-body">
-                <p>Attention 수식의 분모에 들어가는 <b>$\sqrt{d_k}$ 스케일링</b>은 내적 연산의 수치 안정성을 위해 필수적입니다.</p>
+                <p>Attention 수식의 분모에 들어가는 <b>\(\sqrt{d_k}\) 스케일링</b>은 내적 연산의 수치 안정성을 위해 필수적입니다.</p>
 
                 <div class="math-box">
-                    $$\text{Attention}(Q, K, V) = \text{Softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$
+                    $$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$
                 </div>
 
                 <div class="info-card card-score">
-                    <div class="card-title">⚠️ 왜 내적 값에 스케일링($\div \sqrt{d_k}$)이 필요한가?</div>
+                    <div class="card-title">⚠️ 왜 내적 값에 스케일링(\(\div \sqrt{d_k}\))이 필요한가?</div>
                     <p style="font-size: 0.92rem;">
-                        차원 $d_k$가 커지면 내적 값 $QK^T$의 분산이 커져 수치가 매우 커집니다. 내적 값이 너무 크면 Softmax 지수 연산 특성상 <b>기울기 소멸(Gradient Vanishing)</b>이 발생하므로 차원 수의 제곱근으로 나누어 정규화합니다.
+                        차원 \(d_k\)가 커지면 내적 값 \(QK^T\)의 분산이 커져 수치가 매우 커집니다. 내적 값이 너무 크면 Softmax 지수 연산 특성상 <b>기울기 소멸(Gradient Vanishing)</b>이 발생하므로 차원 수의 제곱근으로 나누어 정규화합니다.
                     </p>
                 </div>
 
                 <div class="grid-2col">
                     <div class="info-card">
-                        <div class="card-title" style="font-size: 0.95rem;">스케일링 전 ($[1, 0, 1]$)</div>
-                        <div class="math-box" style="font-size:0.85rem;">$$\text{Softmax}([1, 0, 1]) \rightarrow [0.42, 0.16, 0.42]$$</div>
+                        <div class="card-title" style="font-size: 0.95rem;">스케일링 전 (\([1, 0, 1]\))</div>
+                        <div class="code-inline">Softmax([1, 0, 1]) → [0.42, 0.16, 0.42]</div>
                     </div>
                     <div class="info-card card-k">
-                        <div class="card-title" style="font-size: 0.95rem;">스케일링 후 ($\div \sqrt{2} \approx 1.414$)</div>
-                        <div class="math-box" style="font-size:0.85rem;">$$\text{Softmax}([0.707, 0, 0.707]) \rightarrow [0.401, 0.198, 0.401]$$</div>
+                        <div class="card-title" style="font-size: 0.95rem;">스케일링 후 (\(\div \sqrt{2} \approx 1.414\))</div>
+                        <div class="code-inline">Softmax([0.707, 0, 0.707]) → [0.401, 0.198, 0.401]</div>
                     </div>
                 </div>
 
@@ -1709,20 +1788,20 @@
                 <div class="slide-number">Slide 28 / 41</div>
             </div>
             <div class="slide-body">
-                <p>단어 'I'의 Query($Q_I$)가 전체 문장의 K, V 행렬과 연산하여 문맥을 흡수합니다.</p>
+                <p>단어 'I'의 Query(\(Q_I\))가 전체 문장의 \(K, V\) 행렬과 연산하여 문맥을 흡수합니다.</p>
 
                 <div class="info-card card-v">
                     <div class="card-title">🔄 단어 'I' 문맥 연산 3단계</div>
                     <ol style="margin-left: 20px; font-size: 0.9rem; line-height: 1.8;">
-                        <li><b>Dot Product 내적 유사도 ($Q_I \cdot K^T$):</b> $[1, 0] \begin{bmatrix} 1 & 0 & 1 \\ 0 & 1 & 1 \end{bmatrix} = \mathbf{[1, 0, 1]}$</li>
-                        <li><b>Softmax 확률화:</b> $\text{Softmax}([1, 0, 1]) = \mathbf{[0.42, 0.16, 0.42]}$ (I: 42%, love: 16%, you: 42%)</li>
+                        <li><b>Dot Product 내적 유사도 (\(Q_I \cdot K^T\)):</b> \([1, 0] \cdot \begin{bmatrix} 1 & 0 & 1 \\ 0 & 1 & 1 \end{bmatrix} = \mathbf{[1, 0, 1]}\)</li>
+                        <li><b>Softmax 확률화:</b> \(\text{Softmax}([1, 0, 1]) = \mathbf{[0.42, \, 0.16, \, 0.42]}\) (I: 42%, love: 16%, you: 42%)</li>
                         <li><b>Value 가중합 (Context Vector):</b><br>
-                            $$0.42[0,1] + 0.16[0,1] + 0.42[0,0] = \mathbf{[0.16, 0.42]}$$
+                            \(0.42 \times [0,1] + 0.16 \times [0,1] + 0.42 \times [0,0] = \mathbf{\textcolor{#c084fc}{[0.16, \, 0.42]}}\)
                         </li>
                     </ol>
                 </div>
 
-                <p style="font-size: 0.95rem;">단어 'I'의 새로운 벡터 $[0.16, 0.42]$는 단순 'I'의 의미를 넘어 <b>'love'의 16%, 'you'의 42% 문맥이 융합된 맥락 벡터</b>로 업데이트됩니다.</p>
+                <p style="font-size: 0.95rem;">단어 'I'의 새로운 벡터 \([0.16, 0.42]\)는 단순 'I'의 의미를 넘어 <b>'love'의 16%, 'you'의 42% 문맥이 융합된 맥락 벡터</b>로 업데이트됩니다.</p>
 
                 <div class="speaker-note">
                     💡 <b>Self-Attention의 본질:</b> 단어가 고정된 뜻에 갇혀있지 않고 주변 단어들의 가중치를 곱해 맥락에 따라 새로운 의미로 재탄생합니다.
@@ -1740,20 +1819,20 @@
                 <div class="slide-number">Slide 29 / 41</div>
             </div>
             <div class="slide-body">
-                <p>단어 'LOVE'의 Query($Q_L=[0,1]$)가 전체 문장의 K, V 행렬과 연산하여 문맥을 흡수합니다.</p>
+                <p>단어 'LOVE'의 Query(\(Q_L=[0,1]\))가 전체 문장의 \(K, V\) 행렬과 연산하여 문맥을 흡수합니다.</p>
 
                 <div class="info-card card-v">
                     <div class="card-title">🔄 단어 'LOVE' 문맥 연산 3단계</div>
                     <ol style="margin-left: 20px; font-size: 0.9rem; line-height: 1.8;">
-                        <li><b>Dot Product 내적 유사도 ($Q_L \cdot K^T$):</b> $[0, 1] \begin{bmatrix} 1 & 0 & 1 \\ 0 & 1 & 1 \end{bmatrix} = \mathbf{[0, 1, 1]}$</li>
-                        <li><b>Softmax 확률화:</b> $\text{Softmax}([0, 1, 1]) = \mathbf{[0.16, 0.42, 0.42]}$ (I: 16%, love: 42%, you: 42%)</li>
+                        <li><b>Dot Product 내적 유사도 (\(Q_L \cdot K^T\)):</b> \([0, 1] \cdot \begin{bmatrix} 1 & 0 & 1 \\ 0 & 1 & 1 \end{bmatrix} = \mathbf{[0, 1, 1]}\)</li>
+                        <li><b>Softmax 확률화:</b> \(\text{Softmax}([0, 1, 1]) = \mathbf{[0.16, \, 0.42, \, 0.42]}\) (I: 16%, love: 42%, you: 42%)</li>
                         <li><b>Value 가중합 (Context Vector):</b><br>
-                            $$0.16[0,1] + 0.42[0,1] + 0.42[0,0] = \mathbf{[0.16, 0.58]}$$
+                            \(0.16 \times [0,1] + 0.42 \times [0,1] + 0.42 \times [0,0] = \mathbf{\textcolor{#c084fc}{[0.16, \, 0.58]}}\)
                         </li>
                     </ol>
                 </div>
 
-                <p style="font-size: 0.95rem;">단어 'LOVE'의 새로운 벡터 $[0.16, 0.58]$는 <b>주어 'I'의 16%, 목적어 'you'의 42% 문맥이 결합된 풍부한 가동사 벡터</b>로 변신합니다.</p>
+                <p style="font-size: 0.95rem;">단어 'LOVE'의 새로운 벡터 \([0.16, 0.58]\)는 <b>주어 'I'의 16%, 목적어 'you'의 42% 문맥이 결합된 풍부한 가동사 벡터</b>로 변신합니다.</p>
 
                 <div class="speaker-note">
                     💡 <b>분석:</b> 'LOVE'는 자신(42%)과 목적어 YOU(42%)에 동일하게 높은 주의를 기울여 최종 [0.16, 0.58] 문맥 출력을 형성합니다.
@@ -1771,20 +1850,20 @@
                 <div class="slide-number">Slide 30 / 41</div>
             </div>
             <div class="slide-body">
-                <p>단어 'YOU'의 Query($Q_Y=[1,1]$)가 전체 문장의 K, V 행렬과 연산하여 문맥을 흡수합니다.</p>
+                <p>단어 'YOU'의 Query(\(Q_Y=[1,1]\))가 전체 문장의 \(K, V\) 행렬과 연산하여 문맥을 흡수합니다.</p>
 
                 <div class="info-card card-v">
                     <div class="card-title">🔄 단어 'YOU' 문맥 연산 3단계</div>
                     <ol style="margin-left: 20px; font-size: 0.9rem; line-height: 1.8;">
-                        <li><b>Dot Product 내적 유사도 ($Q_Y \cdot K^T$):</b> $[1, 1] \begin{bmatrix} 1 & 0 & 1 \\ 0 & 1 & 1 \end{bmatrix} = \mathbf{[1, 1, 2]}$</li>
-                        <li><b>Softmax 확률화:</b> $\text{Softmax}([1, 1, 2]) = \mathbf{[0.21, 0.21, 0.58]}$ (I: 21%, love: 21%, you: 58%)</li>
+                        <li><b>Dot Product 내적 유사도 (\(Q_Y \cdot K^T\)):</b> \([1, 1] \cdot \begin{bmatrix} 1 & 0 & 1 \\ 0 & 1 & 1 \end{bmatrix} = \mathbf{[1, 1, 2]}\)</li>
+                        <li><b>Softmax 확률화:</b> \(\text{Softmax}([1, 1, 2]) = \mathbf{[0.21, \, 0.21, \, 0.58]}\) (I: 21%, love: 21%, you: 58%)</li>
                         <li><b>Value 가중합 (Context Vector):</b><br>
-                            $$0.21[0,1] + 0.21[0,1] + 0.58[0,0] = \mathbf{[0.21, 0.42]}$$
+                            \(0.21 \times [0,1] + 0.21 \times [0,1] + 0.58 \times [0,0] = \mathbf{\textcolor{#c084fc}{[0.21, \, 0.42]}}\)
                         </li>
                     </ol>
                 </div>
 
-                <p style="font-size: 0.95rem;">단어 'YOU'의 새로운 벡터 $[0.21, 0.42]$는 <b>자기 자신(58%)과 주어 I(21%), 동사 love(21%)의 맥락이 조화롭게 통합된 목적어 벡터</b>가 됩니다.</p>
+                <p style="font-size: 0.95rem;">단어 'YOU'의 새로운 벡터 \([0.21, 0.42]\)는 <b>자기 자신(58%)과 주어 I(21%), 동사 love(21%)의 맥락이 조화롭게 통합된 목적어 벡터</b>가 됩니다.</p>
 
                 <div class="speaker-note">
                     💡 <b>분석:</b> 'YOU'의 내적 스코어 2.0이 Softmax를 통과해 58%의 안전한 확률 지시서로 변환되는 과정을 증명했습니다.
@@ -1808,7 +1887,7 @@
                     <div class="info-card card-hw">
                         <div class="card-title">❌ Softmax 적용 전 (Slide 23 거친 스코어)</div>
                         <div class="math-box" style="font-size: 0.85rem; margin: 6px 0;">
-                            $$\text{Output}_{raw} = \begin{bmatrix} 1 & 0 & 1 \\ 0 & 1 & 1 \\ 1 & 1 & 2 \end{bmatrix} \begin{bmatrix} 0 & 1 \\ 0 & 1 \\ 0 & 0 \end{bmatrix} = \mathbf{\begin{bmatrix} [0, 1] \\ [0, 1] \\ [0, 2] \end{bmatrix}}$$
+                            $$\text{Output}_{\text{raw}} = \begin{bmatrix} 1&0&1 \\ 0&1&1 \\ 1&1&2 \end{bmatrix} \begin{bmatrix} 0&1 \\ 0&1 \\ 0&0 \end{bmatrix} = \mathbf{\begin{bmatrix} [0, 1] \\ [0, 1] \\ [0, 2] \end{bmatrix}}$$
                         </div>
                         <ul style="margin-left: 15px; font-size: 0.82rem; line-height: 1.6;">
                             <li>비율 정규화가 없어 수치가 배수로 무제한 튐.</li>
@@ -1819,7 +1898,7 @@
                     <div class="info-card card-v">
                         <div class="card-title">✅ Softmax 적용 후 (Slide 28~30 완벽 정규화)</div>
                         <div class="math-box" style="font-size: 0.85rem; margin: 6px 0;">
-                            $$\text{Output}_{softmax} = \begin{bmatrix} 0.42 & 0.16 & 0.42 \\ 0.16 & 0.42 & 0.42 \\ 0.21 & 0.21 & 0.58 \end{bmatrix} \begin{bmatrix} 0 & 1 \\ 0 & 1 \\ 0 & 0 \end{bmatrix} = {\color{#fbbf24} \begin{bmatrix} [0.16, 0.42] \\ [0.16, 0.58] \\ [0.21, 0.42] \end{bmatrix}}$$
+                            $$\text{Output}_{\text{softmax}} = \begin{bmatrix} 0.42&0.16&0.42 \\ 0.16&0.42&0.42 \\ 0.21&0.21&0.58 \end{bmatrix} \begin{bmatrix} 0&1 \\ 0&1 \\ 0&0 \end{bmatrix} = \mathbf{\begin{bmatrix} [0.16, 0.42] \\ [0.16, 0.58] \\ [0.21, 0.42] \end{bmatrix}}$$
                         </div>
                         <ul style="margin-left: 15px; font-size: 0.82rem; line-height: 1.6;">
                             <li>100% 확률 비율 아래에서 부드럽게 가중합됨.</li>
@@ -1834,7 +1913,7 @@
             </div>
         </div>
 
-        <!-- Slide 32: LLM 2 Execution Phases - Prefill vs Decoding Phase -->
+        <!-- Slide 32 [NEW]: LLM 2 Execution Phases - Prefill vs Decoding Phase -->
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
@@ -1851,7 +1930,7 @@
                         <div class="card-title">1️⃣ Prefill Phase (프롬프트 한 번에 연산)</div>
                         <ul style="margin-left: 15px; font-size: 0.88rem; line-height: 1.7;">
                             <li>사용자가 입력한 문장(프롬프트) 전체 토큰을 <b>한 번에 입력받아 행렬 곱(GEMM) 수행</b>.</li>
-                            <li>모든 토큰의 Q, K, V가 동시에 대규모로 생성됨.</li>
+                            <li>모든 토큰의 \(Q, K, V\)가 동시에 대규모로 생성됨.</li>
                             <li><b>H/W 특성:</b> <span class="hl-q">Compute-Bound</span> (GPU/NPU 연산 코어가 100% 풀 가동!).</li>
                         </ul>
                     </div>
@@ -1872,7 +1951,7 @@
             </div>
         </div>
 
-        <!-- Slide 33: Why KV Cache is Essential? - Latency & Efficiency -->
+        <!-- Slide 33 [NEW]: Why KV Cache is Essential? - Latency & Efficiency -->
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
@@ -1889,7 +1968,7 @@
                         <div class="card-title">❌ KV Cache가 없을 때 (재계산의 비극)</div>
                         <p style="font-size: 0.85rem; line-height: 1.6;">
                             100번째 단어를 생성할 때, 앞선 <b>99개 단어의 Key와 Value를 처음부터 다시 재계산</b>해야 합니다!<br>
-                            ➔ 토큰이 길어질수록 계산량이 $\mathcal{O}(N^2)$으로 폭발하여 <b>추론 속도(Latency)가 멸망</b>하고 연산 코어가 낭비됩니다.
+                            ➔ 토큰이 길어질수록 계산량이 \(O(N^2)\)으로 폭발하여 <b>추론 속도(Latency)가 멸망</b>하고 연산 코어가 낭비됩니다.
                         </p>
                     </div>
 
@@ -1897,13 +1976,13 @@
                         <div class="card-title">✅ KV Cache가 있을 때 (속도 & 효율 혁신)</div>
                         <p style="font-size: 0.85rem; line-height: 1.6;">
                             이전 99개 단어의 Key, Value를 <b>HBM 메모리에 저장(Cache)해 두고 재사용</b>합니다!<br>
-                            ➔ 새로 생성된 토큰 1개의 K, V만 캐시에 덧붙이므로(Row Append) <b>초당 생성 토큰 수(TPS)가 극대화</b>됩니다.
+                            ➔ 새로 생성된 토큰 1개의 \(K, V\)만 캐시에 덧붙이므로(Row Append) <b>초당 생성 토큰 수(TPS)가 극대화</b>됩니다.
                         </p>
                     </div>
                 </div>
 
-                <div class="formula-card" style="font-size: 1.05rem; padding: 14px;">
-                    $$\text{KV Cache} = \text{이전 토큰 K, V 재계산 } {\color{#fbbf24} \mathbf{100\%}} \text{ 제거} \rightarrow \text{추론 속도(Latency) 극대화 + H/W 연산 효율 확보}$$
+                <div class="formula-card" style="font-size: 1.1rem; padding: 14px;">
+                    🚀 KV Cache = 이전 토큰 K, V 재계산 100% 제거 ➔ 추론 속도(Latency) 극대화 + H/W 연산 효율 확보
                 </div>
 
                 <div class="human-note">
@@ -1916,7 +1995,7 @@
             </div>
         </div>
 
-        <!-- Slide 34: LLM Training Memory vs LLM Serving/Inference Memory -->
+        <!-- Slide 34 [NEW]: LLM Training Memory vs LLM Serving/Inference Memory -->
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
@@ -1955,7 +2034,7 @@
             </div>
         </div>
 
-        <!-- Slide 35: User Explosion & KV Cache HBM Memory Surge -->
+        <!-- Slide 35 [NEW]: User Explosion & KV Cache HBM Memory Surge -->
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
@@ -1970,7 +2049,7 @@
                 <div class="info-card card-hw">
                     <div class="card-title">🔥 극단적 서비스 통찰: 학습이 끝나도 HBM은 끊임없이 부족하다!</div>
                     <p style="font-size: 0.9rem; line-height: 1.7;">
-                        "더 이상 모델 학습(Training)이 진행되지 않아 <b>가중치 크기(예: 140GB)가 완벽히 고정</b>되더라도, LLM 서비스를 이용하는 동시 사용자가 <b>1,000명 ➔ 10,000명 ➔ 100,000명으로 폭증</b>하면 KV Cache가 사용하는 메모리가 <b>수천 GB 이상으로 폭발적인 비례 증가</b>를 하게 됩니다!"
+                        "더 이상 모델 학습(Training)이 진행되지 않아 <b>가중치 크기(예: 140GB)가 완벽히 고정</b>되더라도, LLM 서비스를 이용하는 동시 사용자가 <b>1,000명 $\rightarrow$ 10,000명 $\rightarrow$ 100,000명으로 폭증</b>하면 KV Cache가 사용하는 메모리가 <b>수천 GB 이상으로 폭발적인 비례 증가</b>를 하게 됩니다!"
                     </p>
                 </div>
 
@@ -1991,7 +2070,7 @@
             </div>
         </div>
 
-        <!-- Slide 36: HBM Capacity vs HBM Bandwidth -->
+        <!-- Slide 36 [NEW]: HBM Capacity vs HBM Bandwidth -->
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
@@ -2022,7 +2101,7 @@
                 </div>
 
                 <div class="formula-card" style="font-size: 1.05rem; padding: 12px;">
-                    $$\text{LLM 추론 H/W 성패} = \text{HBM 용량 (다수 유저 수용)} \times \text{HBM 대역폭 (초당 토큰 생성 속도)}$$
+                    ⚡ LLM 추론 H/W의 성패 = HBM 용량 (다수 유저 수용) × HBM 대역폭 (초당 토큰 생성 속도)
                 </div>
 
                 <div class="speaker-note">
@@ -2031,7 +2110,7 @@
             </div>
         </div>
 
-        <!-- Slide 37: H/W Optimization Summary - FlashAttention, PagedAttention, Quantization -->
+        <!-- Slide 37 [NEW]: H/W Optimization Summary - FlashAttention, PagedAttention, Quantization -->
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
@@ -2061,7 +2140,7 @@
                     <div class="info-card card-score">
                         <div class="card-title" style="font-size: 0.95rem;">📉 Quantization (양자화)</div>
                         <p style="font-size: 0.83rem; line-height: 1.6;">
-                            KV Cache를 FP16 ➔ INT8/INT4로 축소하여 <b>메모리 용량과 읽기 대역폭 요구량을 1/2~1/4로 절감</b>.
+                            KV Cache를 FP16 $\rightarrow$ INT8/INT4로 축소하여 <b>메모리 용량과 읽기 대역폭 요구량을 1/2~1/4로 절감</b>.
                         </p>
                     </div>
                 </div>
@@ -2079,7 +2158,7 @@
             </div>
         </div>
 
-        <!-- Slide 38: Multi-Head Attention Preview - Why 1 Head is Not Enough -->
+        <!-- Slide 38 [NEW MHA 1]: Multi-Head Attention Preview - Why 1 Head is Not Enough -->
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
@@ -2095,7 +2174,7 @@
                     <div class="info-card card-score">
                         <div class="card-title">⚠️ Single-Head Attention의 한계점</div>
                         <p style="font-size: 0.88rem; line-height: 1.6;">
-                            단 1개의 질문(Q), 키(K), 내용(V) 조합만 사용하면, 단어 간 <b>단 한 종류의 관계(예: 위치상 가까운 관계)</b>에만 좁게 집중하게 되어 복잡한 문맥 관계를 놓치게 됩니다.
+                            단 1개의 질문($Q$), 키($K$), 내용($V$) 조합만 사용하면, 단어 간 <b>단 한 종류의 관계(예: 위치상 가까운 관계)</b>에만 좁게 집중하게 되어 복잡한 문맥 관계를 놓치게 됩니다.
                         </p>
                     </div>
 
@@ -2113,7 +2192,7 @@
             </div>
         </div>
 
-        <!-- Slide 39: Multi-Head Attention Architecture & Parallel Speedup -->
+        <!-- Slide 39 [NEW MHA 2]: Multi-Head Attention Architecture & Parallel Speedup -->
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
@@ -2126,18 +2205,18 @@
                 <p>여러 Head가 독립적으로 추출한 관점들을 하나로 <b>합체(Concat)하고 가중치($W^O$)를 곱해 연산하는 원리</b>입니다.</p>
 
                 <div class="math-box" style="font-size: 0.95rem;">
-                    $$\text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}_1, \text{head}_2, ..., \text{head}_h) W^O$$
+                    $$\text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}_1, \text{head}_2, \dots, \text{head}_h) W^O$$
                 </div>
 
                 <div class="grid-3col">
                     <div class="info-card card-q">
                         <div class="card-title" style="font-size: 0.95rem;">Head 1: 문법 관점</div>
-                        <p style="font-size: 0.83rem;">주어-동사 결합 포커스 (I ➔ love)</p>
+                        <p style="font-size: 0.83rem;">주어-동사 결합 포커스 (I → love)</p>
                     </div>
 
                     <div class="info-card card-k">
                         <div class="card-title" style="font-size: 0.95rem;">Head 2: 지칭 관점</div>
-                        <p style="font-size: 0.83rem;">목적어 지칭 관계 포커스 (love ➔ you)</p>
+                        <p style="font-size: 0.83rem;">목적어 지칭 관계 포커스 (love → you)</p>
                     </div>
 
                     <div class="info-card card-v">
@@ -2159,7 +2238,7 @@
             </div>
         </div>
 
-        <!-- Slide 40: Positional Encoding Preview - Fatal Weakness of Dot Product -->
+        <!-- Slide 40 [NEW POS 1]: Positional Encoding Preview - Fatal Weakness of Dot Product -->
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
@@ -2197,7 +2276,7 @@
             </div>
         </div>
 
-        <!-- Slide 41: Sin/Cos Wave Injection & Seminar Final Summary -->
+        <!-- Slide 41 [NEW POS 2]: Sin/Cos Wave Injection & Seminar Final Summary -->
         <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
@@ -2211,7 +2290,7 @@
                     <div class="info-card card-k">
                         <div class="card-title">🌊 Sin/Cos 삼각함수 위치 파동</div>
                         <div class="math-box" style="font-size: 0.75rem; margin: 4px 0;">
-                            $$PE_{(pos, 2i)} = \sin\left(\frac{pos}{10000^{2i/d}}\right), \quad PE_{(pos, 2i+1)} = \cos\left(\frac{pos}{10000^{2i/d}}\right)$$
+                            \(PE_{(pos, 2i)} = \sin\left(\frac{pos}{10000^{2i/d}}\right), \quad PE_{(pos, 2i+1)} = \cos\left(\frac{pos}{10000^{2i/d}}\right)\)
                         </div>
                         <p style="font-size: 0.82rem;">
                             주기가 다른 삼각함수 파동 수치를 입력 벡터에 Element-wise 더해 단어의 상대적 위치 정보를 모델에 성공적으로 주입합니다.
@@ -2311,11 +2390,11 @@
             document.getElementById('prevBtn').disabled = (index === 0);
             document.getElementById('nextBtn').disabled = (index === totalSlides - 1);
 
-            // Re-render KaTeX formula if available
+            // Re-render KaTeX formula
             try {
                 renderKaTeX();
             } catch (e) {
-                // Fallback safe
+                // KaTeX fallback
             }
 
             initIndexModal();
@@ -2378,10 +2457,6 @@
 
         // Initialize first slide & index
         showSlide(currentSlide);
-
-        window.addEventListener('load', () => {
-            renderKaTeX();
-        });
     </script>
 
 </body>
