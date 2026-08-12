@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 
 <head>
@@ -617,14 +617,171 @@
     <!-- Main Slides Container -->
     <div class="slide-container">
 
-        <!-- Slide 1: Overview & Transformer Architecture -->
+        <!-- Slide 1: Title Cover Slide -->
         <div class="slide active">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>표지. Attention Is All You Need: Transformer & KV Cache H/W 세미나</span>
+                    <span class="slide-title-tag tag-concept">Cover</span>
+                </div>
+            </div>
+            <div class="slide-body">
+                <div class="info-card card-q" style="padding: 24px; text-align: center; background: rgba(56, 189, 248, 0.08); border: 2px solid rgba(56, 189, 248, 0.3);">
+                    <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 12px;">
+                        <span class="slide-title-tag tag-concept">Vaswani et al., 2017</span>
+                        <span class="slide-title-tag tag-hw">LLM & H/W Architecture</span>
+                    </div>
+                    <h1 style="font-size: 2.2rem; font-weight: 800; background: linear-gradient(135deg, #38bdf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px;">
+                        Attention Is All You Need
+                    </h1>
+                    <p style="font-size: 1.15rem; color: var(--text-main); font-weight: 600;">
+                        트랜스포머 아키텍처부터 Self-Attention 1:1 수치 연산, 그리고 KV Cache HBM 메모리 병목까지
+                    </p>
+                </div>
+
+                <div class="grid-3col">
+                    <div class="info-card card-q">
+                        <div class="card-title">1️⃣ 벡터 & Attention</div>
+                        <p style="font-size: 0.88rem; color: var(--text-sub);">
+                            단어의 공간 좌표화(Embedding) & 3대 유사도 지표부터 "I, LOVE, YOU" 수치 행렬 연산 풀이
+                        </p>
+                    </div>
+                    <div class="info-card card-score">
+                        <div class="card-title">2️⃣ Prefill vs Decoding</div>
+                        <p style="font-size: 0.88rem; color: var(--text-sub);">
+                            생성형 LLM의 2단계 추론 특성과 KV Cache H/W 도입으로 인한 재계산 방지 메커니즘
+                        </p>
+                    </div>
+                    <div class="info-card card-hw">
+                        <div class="card-title">3️⃣ HBM 메모리 병목</div>
+                        <p style="font-size: 0.88rem; color: var(--text-sub);">
+                            동시 접속 사용자 수 폭증 시 GPU HBM 대역폭 한계와 메모리 경제학적 한계 분석
+                        </p>
+                    </div>
+                </div>
+
+                <div class="human-note">
+                    💡 <b>문과적 직관 해석:</b> "인공지능의 역사는 트랜스포머 이전과 이후로 나뉩니다. 글자를 한 땀 한 땀 순차적으로 읽던 AI가, 문장 전체를 한눈에 관조하며 맥락을 지배하는 시대로의 대전환!"
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>발표 팁:</b> 본 세미나는 추상적인 수학 기호 대신 4차원 수치 행렬 연산과 실제 GPU 메모리가 터지는 지점까지 직접 눈으로 확인하는 직관적 세미나입니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Table of Contents Slide -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>목차. 세미나 목차 (Table of Contents) & 데이터 흐름 로드맵</span>
+                    <span class="slide-title-tag tag-concept">Index</span>
+                </div>
+            </div>
+            <div class="slide-body">
+                <p>본 세미나는 <b>단어의 벡터화</b>에서 시작하여 <b>Self-Attention 수치 연산</b>을 거쳐 <b>GPU HBM 메모리 병목</b>에 이르는 4단계 로드맵으로 구성됩니다.</p>
+
+                <div class="grid-2col">
+                    <div class="info-card card-q">
+                        <div class="card-title">📍 Part 1. 논문 배경 & 벡터 기초</div>
+                        <p style="font-size: 0.9rem; line-height: 1.6;">
+                            • Transformer 논문의 역사적 위상과 등장 배경<br>
+                            • 단어를 다차원 공간의 수치 좌표로 바꾸는 임베딩<br>
+                            • 3대 거리/유사도 지표 (유클리드, 맨해튼, 코사인)
+                        </p>
+                    </div>
+                    <div class="info-card card-k">
+                        <div class="card-title">📍 Part 2. Self-Attention 1:1 수치 풀이</div>
+                        <p style="font-size: 0.9rem; line-height: 1.6;">
+                            • "I LOVE YOU" $4 \times 2$ 수치 벡터와 QKV 변환<br>
+                            • Query $\times$ Key Dot-Product 유사도 점수 계산<br>
+                            • Softmax 확률 다듬기 & Value 가중합 메커니즘
+                        </p>
+                    </div>
+                    <div class="info-card card-v">
+                        <div class="card-title">📍 Part 3. LLM 추론 & KV Cache H/W</div>
+                        <p style="font-size: 0.9rem; line-height: 1.6;">
+                            • TTFT vs TPOT, Prefill vs Decoding Phase<br>
+                            • KV Cache 저장 및 재사용으로 연산 낭비 방지<br>
+                            • 메모리 재계산 비극과 H/W 트레이드오프
+                        </p>
+                    </div>
+                    <div class="info-card card-hw">
+                        <div class="card-title">📍 Part 4. HBM 메모리 경제학 & 고급 구조</div>
+                        <p style="font-size: 0.9rem; line-height: 1.6;">
+                            • Batch Size & Context Length 확장과 HBM 용량<br>
+                            • Multi-Head Attention (MHA) & GQA 구조<br>
+                            • Positional Encoding (RoPE) 문맥 위치 부여
+                        </p>
+                    </div>
+                </div>
+
+                <div class="human-note">
+                    💡 <b>문과적 직관 해석:</b> "지도(Map) 없이 산을 오를 수 없듯, 목차는 단어 벡터에서 시작해 GPU HBM 메모리 병목에 다다르는 4단계 탐험 지도입니다!"
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>발표 팁:</b> 수식에 지치지 않도록 직관적 4단계로 구성되어 있음을 청중에게 미리 안내하세요.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Background & Significance Slide -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-title">
+                    <span>배경. 왜 Transformer 논문(2017)이 AI의 대혁명인가?</span>
+                    <span class="slide-title-tag tag-concept">Background</span>
+                </div>
+            </div>
+            <div class="slide-body">
+                <p>Google의 <b>"Attention Is All You Need"</b> (Vaswani et al., 2017) 논문은 순차적 독서에 갇혀있던 AI 시대를 종식시키고 <b>현대 LLM(ChatGPT, LLaMA)의 시초</b>가 되었습니다.</p>
+
+                <div class="grid-2col">
+                    <div class="info-card card-hw">
+                        <div class="card-title">🔴 이전 패러다임: RNN / LSTM (순차 연산)</div>
+                        <ul style="margin-left: 15px; font-size: 0.88rem; line-height: 1.7;">
+                            <li><b>순차적 연산 ($t_1 \rightarrow t_2 \rightarrow t_3$):</b> 앞 단어가 계산되어야 다음 단어 계산 가능</li>
+                            <li><b>GPU 병렬 처리 불가능 ($O(N)$):</b> GPU에 코어가 수천 개 있어도 1개 코어만 작동하여 병목 발생</li>
+                            <li><b>장기 의존성 손실 (Long-term Dependency):</b> 문장이 길어지면 초반 단어 정보를 잊어버림</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card card-k">
+                        <div class="card-title">🟢 혁신 패러다임: Transformer (Attention Only)</div>
+                        <ul style="margin-left: 15px; font-size: 0.88rem; line-height: 1.7;">
+                            <li><b>순환(Recurrence) 구조 완전 제거:</b> 모든 단어를 한 번에 대규모 행렬 곱 연산 ($O(1)$)</li>
+                            <li><b>100% GPU 병렬 가속:</b> 수천 개의 GPU 코어를 동시에 가동하여 거대 모델 학습 가능</li>
+                            <li><b>완벽한 문맥 연결:</b> 거리와 무관하게 모든 단어 쌍 간의 관련도(Attention) 직주계산</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="info-card card-q" style="padding: 12px 18px;">
+                    <div class="card-title" style="font-size: 0.95rem; margin-bottom: 6px;">⚡ 데이터 흐름 비교 (Data Flow Comparison)</div>
+                    <div style="display: flex; justify-content: space-around; font-size: 0.85rem; text-align: center;">
+                        <div><b>RNN:</b> <span class="hl-hw">[단어 1] → [단어 2] → [단어 3] ... (느린 병목, GPU 놀고 있음)</span></div>
+                        <div><b>Transformer:</b> <span class="hl-k">[단어 1, 2, 3 ... N 전체] ⇒ [GPU 행렬 곱 병렬 처리] (100% 가속)</span></div>
+                    </div>
+                </div>
+
+                <div class="human-note">
+                    💡 <b>문과적 직관 해석:</b> "RNN이 한 글자씩 느릿느릿 읽는 '달팽이 독서법'였다면, Transformer는 문장 전체를 한 컷의 사진으로 찍어 동시에 분석하는 '슈퍼컴퓨터 독서법'입니다!"
+                </div>
+
+                <div class="speaker-note">
+                    💡 <b>발표 팁:</b> "Attention Is All You Need"라는 논문 제목처럼, '순환 구조(Recurrence)를 다 버리고 어텐션 하나만으로 충분하다'는 자신감이 AI 역사를 바꿨음을 강조하세요.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Overview & Transformer Architecture -->
+        <div class="slide">
             <div class="slide-header">
                 <div class="slide-title">
                     <span>1. 트랜스포머 & KV Cache H/W 개요</span>
                     <span class="slide-title-tag tag-concept">Overview</span>
                 </div>
-                <div class="slide-number">Slide 1 / 44</div>
             </div>
             <div class="slide-body">
                 <p>현대 대형 언어 모델(LLM)의 핵심 아키텍처인 <b>Transformer</b>의 본질은 모든 단어가 서로를 참조하여 맥락을 파악하는 <b>Self-Attention 메커니즘</b>에 있습니다.</p>
