@@ -1,0 +1,48 @@
+Total Slides: 47
+[01] 표지. Attention Is All You Need: Transformer & KV Cache H/W 세미나 Cover | Cards:4, Formula:0, Math:0, HN:1, SN:1
+[02] 목차. 세미나 목차 (Table of Contents) & 데이터 흐름 로드맵 Index | Cards:4, Formula:0, Math:0, HN:1, SN:1
+[03] 배경. 왜 Transformer 논문(2017)이 AI의 대혁명인가? Background | Cards:3, Formula:0, Math:0, HN:1, SN:1
+[04] 1. 트랜스포머 & KV Cache H/W 개요 Overview | Cards:3, Formula:0, Math:0, HN:0, SN:1
+[05] 2. 임베딩 (Embedding) - 단어를 의미 공간의 좌표로 Core Concept | Cards:2, Formula:1, Math:0, HN:0, SN:1
+[06] 3. 임베딩 벡터 수치 예제 (\(d=4\) 특성 축) Math Example | Cards:2, Formula:0, Math:1, HN:1, SN:1
+[07] 4. 동일한 두 벡터로 비교하는 Distance vs Similarity Core Concept | Cards:2, Formula:0, Math:0, HN:0, SN:1
+[08] 5. 유클리드 거리 (Euclidean Distance, \(L_2\)) Distance Metric | Cards:1, Formula:0, Math:1, HN:0, SN:1
+[09] 6. 맨해튼 거리 (Manhattan Distance, \(L_1\)) Distance Metric | Cards:1, Formula:0, Math:1, HN:0, SN:1
+[10] 7. 코사인 유사도 (Cosine Similarity) Similarity Metric | Cards:1, Formula:0, Math:1, HN:0, SN:1
+[11] 8. 왜 트랜스포머는 Dot Product(내적)을 사용하는가? H/W & Math Logic | Cards:2, Formula:1, Math:0, HN:1, SN:1
+[12] 9. 3차원에서 수천 차원(LLM \(d=4096\))으로의 확장성 Scalability | Cards:2, Formula:0, Math:1, HN:0, SN:1
+[13] 10. 닷 연산 (Dot Product) 실전 수치 계산 예제 Math Example | Cards:3, Formula:0, Math:1, HN:1, SN:1
+[14] 11. 전체 문장 "I LOVE YOU" & 가중치 행렬(\(4\times2\)) 원리 Setup & Projection | Cards:3, Formula:0, Math:1, HN:0, SN:1
+[15] 12. 단어 'I'의 \(Q_I, K_I, V_I\) 투영 수치 계산 Math Step | Cards:0, Formula:0, Math:1, HN:1, SN:1
+[16] 13. 단어 'I' 자기 자신과의 Self-Attention 연산 Self-Attention | Cards:2, Formula:0, Math:2, HN:1, SN:1
+[17] 14. 왜 어텐션 점수(Score) 뒤에 Value(V)를 또 곱하는가? Core Concept | Cards:3, Formula:0, Math:0, HN:1, SN:1
+[18] 15. 단어 'LOVE'의 \(Q_L, K_L, V_L\) 투영 수치 계산 Math Step | Cards:0, Formula:0, Math:1, HN:0, SN:1
+[19] 16. 단어 'LOVE' 자기 자신과의 Self-Attention 연산 Self-Attention | Cards:2, Formula:0, Math:2, HN:0, SN:1
+[20] 17. 단어 'YOU'의 \(Q_Y, K_Y, V_Y\) 투영 수치 계산 Math Step | Cards:0, Formula:0, Math:1, HN:0, SN:1
+[21] 18. 단어 'YOU' 자기 자신과의 Self-Attention 연산 Self-Attention | Cards:2, Formula:0, Math:2, HN:0, SN:1
+[22] 19. "I LOVE YOU" 어텐션 행렬 내적 (\(QK^T\))의 수치별 의미 Matrix Attention | Cards:2, Formula:0, Math:1, HN:0, SN:1
+[23] 20. [종합 1/3] 혼자 있던 'I'가 문맥을 만나는 순간 QKV Synthesis | Cards:3, Formula:0, Math:1, HN:1, SN:1
+[24] 21. [종합 2/3] 점수판 \([1,0,1]\)에 Value(V)를 곱해 '진짜 문맥 정보' 완성하기 QKV Synthesis | Cards:2, Formula:0, Math:1, HN:1, SN:1
+[25] 22. [종합 3/3] Self-Attention 4단계 핵심 프로세스 한눈에 보기 Master Map | Cards:4, Formula:0, Math:0, HN:0, SN:1
+[26] 23. 전체 문장 "I LOVE YOU" 한 번에 묶는 Q, K, V 행렬 통합 연산 Full Matrix Attention | Cards:1, Formula:0, Math:1, HN:1, SN:1
+[27] 24. [Softmax 1/3] Softmax란 무엇인가? — 거친 수치를 합 1.0(100%) 확률로! Softmax Math | Cards:3, Formula:0, Math:1, HN:1, SN:1
+[28] 25. [Softmax 2/3] 왜 하필 \(e^x\) (자연상수 e)를 쓸까? — 딥러닝 미분의 비밀 Derivative Secret | Cards:2, Formula:1, Math:0, HN:1, SN:1
+[29] 26. [Softmax 3/3] 그래서 왜 \(QK^T\) 내적 곱 뒤에 Softmax를 적용해야 하는가? Pipeline Connection | Cards:2, Formula:0, Math:0, HN:1, SN:1
+[30] 27. Scaled Dot-Product Attention & 스케일링 Math Concept | Cards:3, Formula:0, Math:1, HN:0, SN:1
+[31] 28. 단어 'I'의 Softmax 정규화 & 문맥 벡터 수치 연산 Word Step (I) | Cards:1, Formula:0, Math:0, HN:0, SN:1
+[32] 29. 단어 'LOVE'의 Softmax 정규화 & 문맥 벡터 수치 연산 Word Step (LOVE) | Cards:1, Formula:0, Math:0, HN:0, SN:1
+[33] 30. 단어 'YOU'의 Softmax 정규화 & 문맥 벡터 수치 연산 Word Step (YOU) | Cards:1, Formula:0, Math:0, HN:0, SN:1
+[34] 31. Softmax 적용 전(Slide 23) vs 적용 후(Slide 28~30) 극적 비교 Comparison | Cards:2, Formula:0, Math:2, HN:0, SN:1
+[35] 32. [LLM Master Map] 프롬프트 입력부터 첫 토큰 출력까지 — Prefill \(\rightarrow\) Decoding 전체 흐름도 Master Pipeline | Cards:3, Formula:0, Math:0, HN:1, SN:1
+[36] 33. [HBM Architecture 1/2] HBM 메모리 거주자 2대장 — 고정 가중치(Model Weights) vs 동적 KV Cache HBM Memory Structure | Cards:2, Formula:0, Math:0, HN:1, SN:1
+[37] 34. [LLM Generation 1/3] 단어 'VERY'는 어디서 튀어 나왔나? — LLM 첫 단어 출력 메커니즘 Q_VERY Origin | Cards:2, Formula:0, Math:0, HN:1, SN:1
+[38] 35. [LLM Generation 2/3] 단어 'VERY'의 분신 \(K_{\text{VERY}}, V_{\text{VERY}}\) 투영 및 HBM 4행 Append Row Append Math | Cards:4, Formula:0, Math:0, HN:1, SN:1
+[39] 36. [LLM Generation 3/3] \(Q_{\text{VERY}}\)가 HBM 4줄 \(K, V\)를 읽어오는 어텐션 연산 Decoding Attention | Cards:2, Formula:0, Math:0, HN:1, SN:1
+[40] 37. LLM '학습(Training)' vs '서비스/추론(Serving)' 메모리 구조 비교 Memory Economics | Cards:2, Formula:0, Math:0, HN:0, SN:1
+[41] 38. 사용자가 늘수록 KV Cache 폭발 — "학습이 끝나도 HBM이 거대하게 필요한 이유!" HBM Scaling | Cards:3, Formula:0, Math:0, HN:0, SN:1
+[42] 39. H/W 병목의 핵심: HBM 용량(Capacity) vs HBM 대역폭(Bandwidth) HBM Dual Limits | Cards:2, Formula:1, Math:0, HN:0, SN:1
+[43] 40. [H/W 요약] Roofline 모델 & LLM Serving H/W 엔지니어링 3대 지침 H/W Optimization | Cards:4, Formula:0, Math:0, HN:0, SN:1
+[44] 41. [추후 세미나 1] Multi-Head Attention — 왜 1개 Head로는 부족한가? Future Topic MHA | Cards:2, Formula:0, Math:0, HN:0, SN:1
+[45] 42. Multi-Head Attention의 다채로운 문맥 탐색 & 병렬 가속 원리 MHA Concept | Cards:4, Formula:0, Math:1, HN:0, SN:1
+[46] 43. [추후 세미나 2] Positional Encoding — 어텐션 행렬 곱의 치명적 약점 Future Topic Positional | Cards:2, Formula:0, Math:0, HN:1, SN:1
+[47] 44. 위치 정보 주입(Sin/Cos 파동)과 세미나 최종 총정리 Final Summary | Cards:3, Formula:0, Math:1, HN:0, SN:1
